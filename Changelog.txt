@@ -1,0 +1,190 @@
+1.0.5.2:
+	/\ Fixed Civilians doing more than X amount of damage to Civilians not decreasing their karma
+
+1.0.5.1:
+	/\ "How to examine quickly" now increases exam speed by 1 sec instead of 0.75 sec
+	/\ Fixed not being able to select a different weapon using the mouse wheel if the player looked at a player some time ago
+	/\ Fixed a spam of instructions when you become an Agent at the start of a round
+
+1.0.5:
+	+ Players now have their sprint speed slowed down to 50% after taking damage (the slow-down dissapears in about 1-2 secs)
+	+ When a player has 20 health or less, his sprint speed increase will be 15% (as opposed to 138% when healthy) and he won't be able to grab onto ledges to pull himself up
+	+ Now if a Civilian does more than 175 damage points to Civilians/VIP, then that player can be killable with no karma loss as a Civilian (the amount of damage is controllable via convar)
+	+ Added 14 more tips
+	+ Players can now give each other money - to control the amount of money to give use your mouse wheel (next and previous weapon binds) and press your noclip key (default - V) to give the amount
+	+ Now if an Agent examines a dead body and there are players nearby, then he will report the dead body
+	+ Added a "Report body" button for Agents when they're examining dead bodies and need to report dead bodies in order to prevent giving themselves away
+	+ The first Agent who identifies the dead body of an Agent or the VIP will receive money. (100$ for an Agent, 200$ for the VIP, can be changed via console variables)
+	/\ Holding down your sprint key while using the voice chat now increases it's range 2x (you pretty much shout this way, which is useful when there are lots of people running somewhere and you need to notify them of something)
+	/\ Joining a different radio channel now wipes the current master password information
+	/\ Joining the default radio channel now sets the correct channel info
+	/\ Sprinting left/right/back is now slower than sprinting forward
+	/\ Server admins can now see the names of people who use voice chat and regular chat (for administrative purposes)
+	/\ Fixed armor not working
+	/\ Decreased maximum carryable poison darts from 10 to 5
+	
+	/\ Changed the stamina loss when receiving damage:
+		* If you get hit in the arms/torso/etc. you lose 50% stamina based on the damage
+		* If you get hit in the head, you lose 200% stamina based on the damage
+		* If you get hit in the legs, you lose 125% stamina based on the damage
+		* Example: you receive 20 damage, arms/torso = 10 stamina; legs = 25 stamina; head = 40 stamina
+		
+	/\ Taking damage now also delays stamina regen by one second
+	/\ Fixed using the team chat without a Walkie-talkie resulting in global chat (now only you can see your message if you use team chat without a Walkie-talkie)
+	/\ Fixed players typing in the chat displaying their names, even if the player wasn't examined
+	/\ Fixed the next tip key displaying as not bound only if your spawn menu key was not bound
+	/\ Changed (TEAM) text to (RADIO) when using the team chat with a Walkie-talkie
+	/\ If dec_noreturnfirekarmaloss is enabled, then players will now lose 2 instead of 10 karma points
+	/\ Slight client-side optimization
+	/\ dec_noreturnfirekarmaloss now defaults to 0. Note: if you started the gamemode once already, it will not default to 0
+
+1.0.4.1:
+	Sorry about this update, folks, but some people disliked one thing, so I added a convar
+	+ Added a convar to enable/disable karma loss for killing armed Civilians that did not return fire as an Agent 
+
+1.0.4:
+	+ Added a new book - "How to examine quickly". Increases player examination speed
+	+ Agents now also lose karma if they kill an armed Civilian who did not return fire
+	+ Agents now also lose karma if they kill more than a specified (by the server) amount of armed Civilians. (check the readme for the convar)
+	+ Added 6 lines of dialogue for Agents so they know that they shouldn't kill as many armed Civilians as they want
+	+ Added a console variable to control the ban length for having a karma lower than 60%
+
+	/\ Changed the amount of time it takes for a round to prepare:
+		* The first ever round will be in preparation for 30 seconds (to make sure that upon map change as many as possible people can play and don't have to spectate)
+		* Every other round will be in preparation for 15 seconds (just like it was in previous versions)
+		
+	/\ Completely fixed the ban system
+	/\ The Dart gun now plays a reload sound on the client and a reload animation in third person
+	/\ The Dart gun now drains 100 health in 10 seconds (was 20). There was no point in buying it because it was less of use than, say, 2 shots to the head from a pistol (you kill a person way faster that way)
+	/\ As per community feedback, player names are now "Unknown person" until the person is examined
+	/\ As per community feedback, killing unarmed Civilians as an Agent now decreases karma by 15 points instead of 10
+	/\ Lowered the price of "How to detect concealation" and "How to conceal your weapons" from 100$ to 75$
+	/\ Changed players' nickname color in the chatbox
+
+1.0.3.1:
+	/\ Fixed the 1 hour ban system not working
+	/\ Fixed non-Agents being able to buy Dart gun ammo
+	/\ Fixed players joining after a round has already started resulting in unusable Ghost Powers
+
+1.0.3:
+	+ Added 10 new convars to control stamina drain/regen rates. The changes are instant, no map restarts needed. (check the readme for the convars)
+	+ Added 4 new convars to control health regen. The changes are instant, no map restarts needed. (check the readme for the convars)
+	+ Added 2 convars to control the ability to pick props up with the use key. The changes are instant, no map restarts needed. (check the readme for the convars)
+	+ Added a convar which enables or disables damage from props (to disable prop-kills by picking up props with the use key and throwing them at players, disabled by default)
+	+ Added 3 new tips
+	+ Added buyable Walkie-talkies. These are radios that allow the use of quick pre-made radio command usage.
+	+ Added a new weapon - Dart gun. Fires out poison darts that make a player lose 100 health in 20 seconds. Available to Agents only.
+	+ Added a new item - Antidote. Cures the poison status received from a poison dart. Available to everyone.
+	+ Added Ghost Mode for spectators/killed players - they can now play spooky sounds (SECONDARY ATTACK KEY) and push props around (PRIMARY ATTACK KEY)
+	+ Added 4 more player models for the gamemode to choose from
+	
+	/\ Changed the role of the chat and the voice chat:
+		* The default chat now has a range, the range is the same range from which you can see a player's nickname, his health, status, etc. from
+		* The team chat is now the radio chat. If people have Walkie-talkies and are on the same channel, then they will be able to see the text from anywhere
+		* The voice chat is still ranged, but if people have Walkie-talkies and are on the same channel, then they will be able to hear a player use his microphone from anywhere
+		* The range of the voice chat can now be tweaked using a convar
+		* The range of the default chat can be tweaked using a convar
+		
+	/\ From now on the player role data will be sent to the player every second until the player sends back the confirmation of receival
+	/\ Fixed the firemode indicator clipping with the text that indicates the keys to drop/conceal weapon (weird, I thought I fixed that while this was still in development)
+	/\ Fixed weapon shadows being drawn even if a player has his weapon concealed
+	/\ Fixed opening 2 menus at the same time resulting in a bug that would not let you close the second menu.
+	/\ Now examining a player that was previously marked as dangerous, but does not have any weapons anymore, will become trusted
+	/\ Reduced additional required weight for the player to be marked as "Dangerous" upon examination from 15 to 10
+	/\ Admins won't get banned for having a karma that's too low
+	/\ When the VIP wins the round, every living Civilian will gain 5 points of karma now
+	/\ Changed the model of SMG ammo in the buy menu
+	/\ As per community request, the karma indication is now in percentage, instead of words
+	/\ Slight server-side optimizations
+
+1.0.2:
+	+ Now when your stamina depletes, you'll play 2 breathe sounds to indicate that you're out of stamina
+	+ Players can now break glass without the usage of a weapon.
+	/\ Fixed being able to grab onto a ledge while hanging on a ladder, which resulted in the disability to grab onto a ledge unless you'd deplete your stamina
+	/\ Fixed being able to jump infinitely when your stamina was lower than 15%
+	/\ Slightly changed the way the round time is networked - should fix a small bug and decrease the amount of data networked
+	/\ Fixed connecting after a match has already starting, resulting in a Lua error that happens only once
+	/\ Slightly changed one thing in the buying system - now it's much easier to limit stuff per player role
+	/\ Another HUGE chunk of client-side optimization and a bit more of server-side optimization
+
+1.0.1:
+	+ Added server-side console variables that control the time it takes and amount of money for a player role to receive money (check the readme.txt for the variables)
+	+ Added a different icon for the "Additional" help sub-menu
+	/\ HUGE client-side and server-side code optimization (thanks to Jvs for providing me the necessary info!)
+	/\ Fixed the buy menu using a non-existant texture for the tabs
+	/\ Tip text changes
+
+1.0.0:
+	][ Initial release!
+	
+The versions below are ones I sent to people who hosted the gamemode while it was still in development.
+If you want to see how the gamemode was built (more or less), take a look at the changes.
+
+0.99:
+	+ Various models and sounds are now precached
+	+ Added tips when dead
+	/\ Fixed disabling stamina blur not disabling the blur
+	/\ Added another invisible prop on cs_assault to improve the blocking out of an exploitable area
+	/\ Blocked off another exploitable part of cs_assault
+	/\ Slight optimizations to server code
+	/\ Further implemented ammo limits
+	/\ Fixed opening mail re-generating spawnicons for every item
+
+0.91:
+	+ Players are now able to unload weapons lying on the floor
+	+ Added a buyable medkit. It restores 25 health points when you retrieve it and increases maximum health regen by 10 points (up to a maximum of 100). Cannot use more than 2 medkits per round.
+	/\ Slightly improved the player filtering out when buying help from the Agency
+	/\ Fixed a bug regarding Agents/VIP disconnecting
+	/\ Fixed being able to conceal a melee weapon at any time (even right after stabbing someone)
+	/\ Fixed the Knife showing it's "caliber" and the amount of "ammo" it has
+	/\ The information panel that shows who won/what's your role/etc. now dynamically scales with the player's nickname size (thanks to Kogitsune for telling me that there's a function that gets text size ._.)
+	/\ Players that spawned on the server after a round has started will be marked as "Dead" for other players now
+	/\ Optimized buy menu item positioning code and fixed a small bug in the process
+	/\ Increased backstab cone by 18 degrees (was 162, now 180)
+	/\ Slightly changed the viewbob when walking
+	/\ Fixed another small bug regarding killing people
+	/\ Fixed joining a server after the match has started resulting in the joined player getting a message saying that he's a Civilian
+	/\ Round starts are now prevented if there are more or equal to 3 players, but there are not enough alive people
+
+0.9:
+	+ Added a sub-menu to the help menu for some more detailed info
+	+ Added an options sub-menu to the help menu
+	+ Edges of a player's screen will now also get slightly blurred when low on stamina
+	+ If a player is underwater, and his stamina is at 0%, he will start drowning
+	/\ Rounds will now end if players such as agents/VIPs leave the server
+	/\ Hearbeat sound is now slower
+	/\ Increased opaqueness on the help menu
+	/\ Added a missing icon for the buy menu
+	/\ Decreased forged VIP ID card's cost from 500$ to 300$
+	/\ Slight optimizations to scoreboard code
+	/\ Increased Agents' starting money from 300$ to 350$
+	/\ Maximum regeneratable health is now 75% instead of 80%
+	/\ VIPs are now able to retrieve their stolen VIP ID cards from killed agents (if the agent stole the VIP ID card, of course)
+	/\ Agents are now not able to buy help from the Agency if the VIP is dead/disconnected/etc.
+	/\ Pressing your crouch key now makes you let go of the ledge you're hanging on
+	/\ Dead players can now hear and see alive people write and talk, but alive can't hear and see dead people write and talk
+	/\ Players now also lose stamina when swimming with their sprint key pressed
+
+0.8:
+	+ Added a Knife weapon. Back-stabs are instant kills. (but the victims scream really loud)
+	+ Added pain sounds
+	+ Added a stamina system
+	+ Added a low ledge grabbing system (lets you grab onto low ledges and pull self up)
+	/\ Armor vests now protect from melee weapons too.
+	/\ Pick-pocketing now plays an animation (to make pick-pocketing riskier)
+	/\ Fixed TMP's fire sound being as loud as an unsilenced weapon
+	/\ Weapons/knives/other is now properly recognized when examining a dead body
+	/\ The contents of mailboxes now also get updated on the client whenever a player uses the mailbox entity
+
+0.78:
+	/\ Maps that are not supported do not feature the mailbox system and instead instantly give the bought item to a player
+	/\ Improved rendering of 3d2d text on mailboxes - they now work perfectly at any given angle of the mailbox
+
+0.7 - 0.77:
+	+ Added a map voting system
+	+ Added rounds per map
+	+ Added various un-added files
+	+ Added limited, slow health regen
+	/\ Examining a body now shows the player's role (Civilian/Agent/VIP)
+	/\ Various bug fixes
+	/\ Went from 2 to 13 supported maps

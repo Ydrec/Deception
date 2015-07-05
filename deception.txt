@@ -1,0 +1,15 @@
+"deception"
+{
+"base"		"base"
+    "title"  "Deception"
+    "version"   "1.3.3.7"
+    "menusystem"	"1"
+
+    "author_name"   ""
+    "author_email"  ""
+    "author_url"    ""
+
+    "icon"  ""
+    "info"  ""
+    "hide"  "0"
+}
