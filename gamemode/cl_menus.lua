@@ -360,6 +360,7 @@ local function DEC_ExamineDeadBody(um)
 	MainFrame2.Alpha = 200
 	
 	KillCaliber = create("DLabel", MainFrame2)
+	print(cal)
 	KillCaliber:SetText("Kill cause - " .. Calibers[cal].cal)
 	KillCaliber:SetPos(10, 30)
 	KillCaliber:SetFont("TabLarge")
