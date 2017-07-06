@@ -473,6 +473,7 @@ local function DEC_PickpocketVIP(um)
 	
 	ent.AddStatus = 1
 	chat.AddText(ColorYellow, "Pick-pocketed ID card; the person is the VIP!")
+	LocalPlayer().IDType = 1
 	surface.PlaySound("buttons/button17.wav")
 end
 
@@ -483,6 +484,7 @@ local function DEC_PickpocketVIP_Fake(um)
 	
 	ent.AddStatus = 3
 	chat.AddText(ColorYellow, "Pick-pocketed ID card; the ID card is fake, that means the person is an enemy Agent!", ColorNeon, "You can now use the fake ID to cause confusion among civilians!")
+	LocalPlayer().IDType = 2
 	surface.PlaySound("buttons/button17.wav")
 end
 

@@ -1473,7 +1473,27 @@ local function DEC_PerformAction(ply)
 				SendUserMessage("VIP_NOID", ply)
 			end
 		elseif ply.IsAgent then
-			if ply.IDType == 2 then
+			/*if ply.IDType == 1 then // fuck it, real card is real!
+				td = {}
+				td.start = ply:GetShootPos()
+				td.endpos = td.start + ply:GetAimVector() * 256
+				td.filter = ply
+				
+				trace = util.TraceLine(td)
+				
+				if trace.Hit then
+					if trace.Entity:IsPlayer() then
+						umsg.Start("VIP_SHOW", trace.Entity)
+							umsg.Entity(ply)
+						umsg.End()
+						
+						umsg.Start("VIP_SHOWN", ply)
+							umsg.Entity(trace.Entity)
+						umsg.End()
+					end
+				end
+			end*/
+			if ply.IDType == 2 or ply.IDType == 1 then
 				td = {}
 				td.start = ply:GetShootPos()
 				td.endpos = td.start + ply:GetAimVector() * 256

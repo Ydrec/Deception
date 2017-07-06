@@ -1,7 +1,7 @@
 local Map, map, vote
 
 function GM:SetupMaps()
-	Maps = file.Read("mapcycle.txt", "DATA") -- read that file nigga
+	Maps = file.Read("cfg/mapcycle.txt", "GAME") -- read that file nigga
 	Maps = string.Explode("\n", Maps) -- separate map names
 	
 	for k, v in pairs(Maps) do
