@@ -80,7 +80,7 @@ vgui.Register("Stats", Stats, "DPanel")
 
 local PANEL = {}
 
-function PANEL:Paint()
+function PANEL:Paint(...)
 	W = self:GetWide()
 	clr(70, 100, 70, 150)
 	rect(1, 1, W - 2, self:GetTall() - 2)
@@ -103,7 +103,7 @@ function PANEL:Paint()
     end
      
     render.SetScissorRect( sl, st, sr, sb, true )
-        self.BaseClass.Paint( self )
+        self.BaseClass.Paint( self, ... )
     render.SetScissorRect( 0, 0, 0, 0, false )
 	
 	clr(137, 165, 126, 255)
