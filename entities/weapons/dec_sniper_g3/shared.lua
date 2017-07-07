@@ -55,6 +55,7 @@ SWEP.ShowWorldModel = true
 SWEP.ViewModelBonescales = {}
 
 SWEP.Weight				= 5
+SWEP.Size 				= 13
 SWEP.AutoSwitchTo		= false
 SWEP.AutoSwitchFrom		= false
 
