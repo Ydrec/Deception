@@ -693,7 +693,7 @@ NI.CanBuy = function(ply)
 		
 		for k, v in pairs(ply.NonVIPPlayers) do
 			if v.IsVIP or not IsValid(v) or not v:Alive() or v == ply then
-				table.remove(ply.NonVIPPlayers, k)
+				table.RemoveByValue(ply.NonVIPPlayers, v)
 			end
 		end
 	end
@@ -701,7 +701,7 @@ NI.CanBuy = function(ply)
 	if ply.NonVIPPlayers then
 		for k, v in pairs(ply.NonVIPPlayers) do
 			if not IsValid(v) or not v:Alive() or v == ply then
-				table.remove(ply.NonVIPPlayers, k)
+				table.RemoveByValue(ply.NonVIPPlayers, v)
 			end
 		end
 		
@@ -765,7 +765,7 @@ NI.CanBuy = function(ply)
 		
 		for k, v in pairs(ply.NonVIPPlayers) do
 			if v.IsVIP or not IsValid(v) or not v:Alive() or v == ply then
-				table.remove(ply.NonVIPPlayers, k)
+				table.RemoveByValue(ply.NonVIPPlayers, v)
 			end
 		end
 	end
@@ -773,7 +773,7 @@ NI.CanBuy = function(ply)
 	if ply.NonVIPPlayers then
 		for k, v in pairs(ply.NonVIPPlayers) do
 			if not IsValid(v) or not v:Alive() or v == ply then
-				table.remove(ply.NonVIPPlayers, k)
+				table.RemoveByValue(ply.NonVIPPlayers, v)
 			end
 		end
 		
