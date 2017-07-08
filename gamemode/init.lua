@@ -166,13 +166,13 @@ CreateConVar("dec_analysis_initial", "33", (FCVAR_ARCHIVE || FCVAR_REPLICATED ||
 CreateConVar("dec_maxweapons", "2", (FCVAR_ARCHIVE || FCVAR_REPLICATED || FCVAR_NOTIFY))
 CreateConVar("dec_maxweapons_unique", "2", (FCVAR_ARCHIVE || FCVAR_REPLICATED || FCVAR_NOTIFY))
 
-FirstRound = true
-GameStarted = false
-CanBuy = false
-GameStartTime = 0
-RoundsPlayed = 0
+FirstRound = FirstRound or true
+GameStarted = GameStarted or false
+CanBuy = CanBuy or false
+GameStartTime = GameStartTime or 0
+RoundsPlayed = RoundsPlayed or 0
 
-GM.PlayerSpawnTime = {}
+GM.PlayerSpawnTime = GM.PlayerSpawnTime or {}
 
 local CT, dtint2, wl, SP, RS, HSP, dist, Dot, td, trace, dmgtype, num, wep, ong, isply, isval, ta, la, distance, dmg, FinalDamageDecay, snd, vol, mdl, pos, ang, sound, RT, rand, MR, ent, cl, aim, haim, dot, rag, mailboxes, item, dosh, cb, inserted, amt, cap, t, ct, def, randpos, res, karma, mywep, wepclass, phys, itm, trace1, trace2, timetosend, hpon, hpmax, hptime, sprintdrain, sprinttime, hangdrain, hangtime, regen, regentime, drown, drowntime, rtype, rcat, rsound, chan, joinchan, pass, mpass, gp, time, dmgmod, hm, m
 
@@ -188,19 +188,19 @@ function GM:CreateEnts()
 			ent:SetPos(v.pos)
 			ent:SetAngles(v.ang)
 			ent:SetColor(v.color)
-			
+
 			if v.model then
 				ent:SetModel(v.model)
 			end
-			
+
 			if v.drawstatus then
 				ent:SetNoDraw(v.drawstatus)
 			end
-			
+
 			ent:Spawn()
-			
+
 			phys = ent:GetPhysicsObject()
-			
+
 			if phys:IsValid() then
 				phys:EnableMotion(false)
 			end
@@ -208,7 +208,7 @@ function GM:CreateEnts()
 	end
 end
 
-function GM:InitPostEntity()	
+function GM:InitPostEntity()
 	self:CreateEnts()
 end
 
@@ -272,30 +272,31 @@ function GM:PlayerSpawn(ply)
 		ply.ExamTime = 2
 		ply.DamageSpeedMod = 1
 		ply.DamageDone = 0
+		ply.HintsBought = 0
 		ply.FingerPrint = math.random(1, 50000)
 		ply:PositionMe()
-		
+
 		SendUserMessage("ARMOR_RESET")
-		
+
 		ply.BodyArmCondition = 0
 		ply.BodyArmDamageDec = 1
-		
+
 		if not GameStarted and self:CanStartRound() then
 			self:AttemptSelection()
 		end
 	else
 		ply:KillSilent()
-		
+
 		timer.Simple(0, function()
 			ply:SetSolid(SOLID_NONE)
 			ply:SetMoveType(MOVETYPE_NOCLIP)
 			ply:Spectate(OBS_MODE_ROAMING)
 		end)
-		
+
 		umsg.Start("ROUNDTIME", ply)
 			umsg.Long((GameStartTime - CurTime()) + GetConVarNumber("dec_roundtime"))
 		umsg.End()
-		
+
 		umsg.Start("KILLPLAYER")
 			umsg.Entity(ply)
 		umsg.End()
@@ -310,27 +311,27 @@ function GM:PlayerDisconnected(ply)
 			elseif ply == AgentB then
 				AgentB = nil
 			end
-			
+
 			SendUserMessage("DISC_AGENT")
 		end
-		
+
 		if ply.IsVIP then
 			VIP = nil
-			
+
 			SendUserMessage("DISC_VIP")
 		end
-		
+
 		if not AgentA and not AgentB and VIP then
 			self:EndRound(1)
 		end
-		
+
 		if AgentA and not AgentB and not VIP then
 			self:EndRound(2, AgentA)
 		elseif AgentB and not AgentA and not VIP then
 			self:EndRound(2, AgentB)
 		end
 	end
-	
+
 	if ply.Ragdoll then
 		SafeRemoveEntity(ply.Ragdoll)
 	end
@@ -340,10 +341,10 @@ function GM:PlayerCanHearPlayersVoice(listener, talker)
 	if not CanBuy then
 		return true
 	end
-	
+
 	la = listener:Alive()
 	ta = talker:Alive()
-	
+
 	if la and ta then
 		if talker.HasWalkieTalkie and listener.HasWalkieTalkie and listener.Channel == talker.Channel then
 			return true
@@ -353,15 +354,15 @@ function GM:PlayerCanHearPlayersVoice(listener, talker)
 			end
 		end
 	end
-	
+
 	if ta and not la then
 		return true
 	end
-	
+
 	if not ta and not la then
 		return true
 	end
-	
+
 	return false
 end
 
@@ -369,13 +370,13 @@ function GM:PlayerCanSeePlayersChat(text, tm, listener, talker)
 	if not CanBuy then
 		return true
 	end
-	
+
 	la = listener:Alive()
 	ta = talker:Alive()
 
 	if la and ta then
 		if tm then
-			if talker.HasWalkieTalkie then 
+			if talker.HasWalkieTalkie then
 				if listener.HasWalkieTalkie and listener.Channel == talker.Channel then
 					return true
 				end
@@ -388,34 +389,34 @@ function GM:PlayerCanSeePlayersChat(text, tm, listener, talker)
 			end
 		end
 	end
-	
+
 	if ta and not la then
 		return true
 	end
-	
+
 	if not ta and not la then
 		return true
 	end
-	
+
 	return false
 end
 
 local rs
 
 function GM:Think()
-	CT = CurTime() 
+	CT = CurTime()
 	hpon = GetConVarNumber("dec_healthregen_enabled")
 	hptime = GetConVarNumber("dec_healthregen_regentime")
 	sprintdrain, sprinttime, hangdrain, hangtime, regen, regentime, drown, drowntime = GetConVarNumber("dec_stamina_drain_sprint_amount"), GetConVarNumber("dec_stamina_drain_sprint_time"), GetConVarNumber("dec_stamina_drain_ledgehang_amount"), GetConVarNumber("dec_stamina_drain_ledgehang_time"), GetConVarNumber("dec_stamina_regen_amount"), GetConVarNumber("dec_stamina_regen_time"), GetConVarNumber("dec_stamina_drain_underwater_amount"), GetConVarNumber("dec_stamina_drain_underwater_time")
-	
+
 	for k, v in pairs(player.GetAll()) do
 		if v:Alive() then
 			v.DamageSpeedMod = math.Approach(v.DamageSpeedMod, 1, 0.005)
-			
+
 			dtint2 = v:GetDTInt(2)
 			hp = v:Health()
 			wep = v:GetActiveWeapon()
-			
+
 			if IsValid(wep) then
 				if wep:GetDTInt(3) == 20 then
 					wep:SetHoldType("normal")
@@ -423,23 +424,23 @@ function GM:Think()
 					wep:SetHoldType(wep.HoldType)
 				end
 			end
-			
+
 			if v.Poisoned then
 				v.SuppressPain = true
 				v.HealthRegenTime = CT + 1
 				v.StaminaRegenTime = CT + 1
-				
+
 				if CT >= v.PoisonHealth then
 					v:TakeDamage(1, v.Poisoner, v.Poisoner)
 					v.PoisonHealth = CT + 0.08
 				end
-				
+
 				if CT >= v.PoisonStamina then
 					v:SetDTInt(2, math.Clamp(dtint2 - 1, 0, 100))
 					v.PoisonStamina = CT + 0.2
 				end
 			end
-			
+
 			if hpon then
 				if v.DrownedHealth == 0 then
 					if CT > v.HealthRegenTime then
@@ -450,23 +451,23 @@ function GM:Think()
 					end
 				end
 			end
-			
+
 			if not v.ReceivedRole then
 				if CT > v.RoleSendTime then
 					if v.IsAgent then
 						SendUserMessage("AGENT", v)
 					end
-					
+
 					if v.IsVIP then
 						SendUserMessage("VIP", v)
 					end
-					
+
 					v.RoleSendTime = CT + 1
 				end
 			end
-			
+
 			rs = v:GetRunSpeed()
-			
+
 			if hp <= 20 then
 				if rs != 150 then
 					v:SetRunSpeed(150)
@@ -479,7 +480,7 @@ function GM:Think()
 							v:SetRunSpeed(130)
 							v:SetJumpPower(0)
 						end
-						
+
 						if not v:KeyDown(IN_SPEED) then
 							v.iRunSpeed = rs
 							v:SetRunSpeed(130)
@@ -494,9 +495,9 @@ function GM:Think()
 					end
 				end
 			end
-				
+
 			wl = v:WaterLevel()
-			
+
 			if wl == 3 then
 				if dtint2 > 0 then
 					if CT > v.StaminaDrownTime then
@@ -509,7 +510,7 @@ function GM:Think()
 						v:TakeDamage(1, v, v)
 						v.StaminaDrownTime = CT + 0.1
 					end
-							
+
 					if CT > v.PainDelay then
 						v:EmitSound("player/pl_drown" .. math.random(1, 3) .. ".wav", 70, 100)
 						v.PainDelay = CT + 1
@@ -527,12 +528,12 @@ function GM:Think()
 					end
 				end
 			end
-			
+
 			if not v.HasGrabbed then
 				if v:KeyDown(IN_SPEED) and v:GetVelocity():Length() > v:GetWalkSpeed() * 1.2 then
 					ong = v:OnGround()
 					wl = v:WaterLevel()
-					
+
 					if ong or wl >= 2 then
 						if CT > v.StaminaDrainTime then
 							v:SetDTInt(2, math.Clamp(dtint2 - sprintdrain, 0, 100))
@@ -558,7 +559,7 @@ function GM:Think()
 					end
 				end
 			end
-			
+
 			if IsValid(v.CarryEnt) then
 				if v.LastLook then
 					if (v:GetAimVector() - v.LastLook):Length() > 0.4 then -- limit turn speed
@@ -567,15 +568,15 @@ function GM:Think()
 						v.LastLook = nil
 					end
 				end
-				
+
 				v.LastLook = v:GetAimVector()
-				
+
 				if v:EyeAngles().p <= -10 then -- limit view height
 					v:DropObject(v.CarryEnt)
 					v.CarryEnt = nil
 					v.LastLook = nil
 				end
-				
+
 				if v:GetVelocity():Length() > v:GetWalkSpeed() * 1.2 then -- limit move speed
 					v:DropObject(v.CarryEnt)
 					v.CarryEnt = nil
@@ -583,7 +584,7 @@ function GM:Think()
 			else
 				v.LastLook = nil
 			end
-			
+
 			if CanBuy then
 				if v.Income > 0 then
 					if CT > v.IncomeDelay then
@@ -592,43 +593,43 @@ function GM:Think()
 					end
 				end
 			end
-			
+
 			if v.ExamTarget then
 				SP = v:GetShootPos()
 				HSP = v.ExamTarget:GetShootPos() - Vector(0, 0, 32)
 				dist = SP:Distance(HSP)
-				
+
 				if dist <= 256 then
 					tmp = (HSP - SP)
 					tmp:Normalize()
 					Dot = v:GetAimVector():Dot(tmp)
-					
+
 					if Dot >= 0.7 then
 						td = {}
 						td.start = SP
 						td.endpos = td.start + tmp * 256
 						td.filter = v
-						
+
 						trace = util.TraceLine(td)
-						
+
 						if trace.Hit then
 							if CT > v.ExamFinish then
 								if trace.Entity == v.ExamTarget then
 									num = 1
-									
+
 									if (v.ExamTarget.Weight - v.ExamTarget.WeightDetection) >= v.DetectionAmount then
 										num = 2
 									end
-									
+
 									if (v.ExamTarget.Weight - v.ExamTarget.WeightDetection) >= v.DetectionAmount + 10 then
 										num = 3
 									end
-									
+
 									umsg.Start("EXAMINE_END", v)
 										umsg.Entity(v.ExamTarget)
 										umsg.Short(num)
 									umsg.End()
-									
+
 									v.ExamTarget = nil
 								end
 							end
@@ -647,19 +648,19 @@ function GM:Think()
 			end
 		else
 			gp = v:GetDTInt(3)
-			
+
 			if v:KeyDown(IN_ATTACK) then
 				if gp > 0 then
 					td = {}
 					td.start = v:GetShootPos()
 					td.endpos = td.start + v:GetAimVector() * 2048
 					td.filter = v
-					
+
 					trace = util.TraceLine(td)
-					
+
 					if trace.Hit and trace.Entity:GetClass():find("prop_physics") then
 						phys = trace.Entity:GetPhysicsObject()
-						
+
 						if phys:IsValid() then
 							phys:AddVelocity(v:GetAimVector() * phys:GetMass() * 0.3)
 							v:SetDTInt(3, math.Clamp(gp - 1, 0, 100))
@@ -678,18 +679,18 @@ end
 
 function GM:ScalePlayerDamage(ply, hg, dmginfo)
 	dmginfo:ScaleDamage(0.5) -- halven the damage
-	
+
 	dmg = dmginfo:GetDamage()
-	
+
 	if ply.BodyArmCondition > 0 then
 		if ply.BodyArmDamageDec > 0 then
 			if hg == HITGROUP_CHEST or hg == HITGROUP_STOMACH or hg == HITGROUP_GEAR then -- No protection for arms
 				dmgtype = dmginfo:GetDamageType()
-				
+
 				if dmginfo:IsDamageType(DMG_BULLET) or dmginfo:IsDamageType(DMG_SLASH) then
 					ply.BodyArmCondition = math.Clamp(ply.BodyArmCondition - (math.ceil(dmg / 5) + math.random(1, 3)), 0, 100)
 					dmginfo:ScaleDamage(1 - ply.BodyArmDamageDec)
-					
+
 					umsg.Start("ARMOR_STATUS", ply)
 						umsg.Short(ply.BodyArmCondition)
 					umsg.End()
@@ -699,7 +700,7 @@ function GM:ScalePlayerDamage(ply, hg, dmginfo)
 	end
 
 	dmgmod = 0.5
-	
+
 	if hg == HITGROUP_LEFTARM or hg == HITGROUP_RIGHTARM then
 		dmginfo:ScaleDamage(0.5)
 	elseif hg == HITGROUP_HEAD then
@@ -709,7 +710,7 @@ function GM:ScalePlayerDamage(ply, hg, dmginfo)
 		dmginfo:ScaleDamage(0.75)
 		dmgmod = 1.25
 	end
-	
+
 	ply:SetDTInt(2, math.Clamp(ply:GetDTInt(2) - dmg * dmgmod, 0, 100))
 end
 
@@ -717,7 +718,7 @@ function GM:PlayerCanPickupWeapon(ply, wep)
 	if ply:CountWeapons() >= GetConVarNumber("dec_maxweapons") then
 		return false
 	end
-	
+
 	return true
 end
 
@@ -725,17 +726,17 @@ function GM:AllowPlayerPickup(ply, ent)
 	if GetConVarNumber("dec_pickup_enabled") < 1 then
 		return false
 	end
-	
+
 	if ply:Alive() and IsValid(ent) then
 		phys = ent:GetPhysicsObject()
-		
+
 		if phys:IsValid() then
 			if phys:GetMass() > GetConVarNumber("dec_pickup_weight") then
 				return false
 			end
 		end
 	end
-	
+
 	return true
 end
 
@@ -744,11 +745,11 @@ function GM:EntityTakeDamage(ent, dmginfo)
 	CT = CurTime()
 	local attacker = dmginfo:GetAttacker();
 	local amount = dmginfo:GetDamage();
-	
+
 	if ent:WaterLevel() == 3 then
 		return
 	end
-	
+
 	if isply then
 		if dmginfo:GetDamageType() == DMG_CRUSH then
 			if GetConVarNumber("dec_propdamage") <= 0 then
@@ -756,52 +757,52 @@ function GM:EntityTakeDamage(ent, dmginfo)
 				return
 			end
 		end
-		
+
 		ent.DamageSpeedMod = 0.5
 	end
-	
+
 	dmg = dmginfo:GetDamage()
-	
+
 	if attacker:IsPlayer() and IsValid(attacker:GetActiveWeapon()) and isply then
 		wep = attacker:GetActiveWeapon()
-		
+
 		if wep.EffectiveRange then
 			distance = attacker:GetShootPos():Distance(ent:GetShootPos())
 			dmginfo:ScaleDamage(1) -- scale the damage with ammo types
-			
+
 			FinalDamageDecay = 0
-			
+
 			if distance >= wep.EffectiveRange then
 				FinalDamageDecay = wep.DamageDecay
 			else
 				FinalDamageDecay = wep.DamageDecay * (distance / wep.EffectiveRange)
 			end
-			
+
 			dmginfo:ScaleDamage(1 - FinalDamageDecay)
 		end
-		
+
 		if ent.IsAgent then
 			ent.Attackers[attacker] = true
 		elseif not ent.IsAgent and not ent.IsVIP then
 			attacker.DamageDone = attacker.DamageDone + dmginfo:GetDamage()
 		end
 	end
-	
+
 	if isply then
 		ent.StaminaRegenDelay = CT + 1
-		
+
 		ent.HealthRegenMax = ent.HealthRegenMax - dmginfo:GetDamage() * GetConVarNumber("dec_healthregen_percentage")
 		ent.HealthRegenMax = math.Round(ent.HealthRegenMax)
 		ent.HealthRegenTime = CT + GetConVarNumber("dec_healthregen_dmgpenalty")
-		
+
 		if not ent.SuppressPain then
 			if CT > ent.PainDelay then
 				if (ent:Health() - dmg) <= 0 then
 					return
 				end
-				
+
 				mdl = ent:GetModel()
-							
+
 				if dmg <= 15 then
 					if table.HasValue(PS.HF, mdl) then
 						snd = table.Random(PS.SmallF)
@@ -814,7 +815,7 @@ function GM:EntityTakeDamage(ent, dmginfo)
 					else
 						snd = table.Random(PS.Small)
 					end
-					
+
 					vol = 80
 				elseif dmg <= 40 then
 					if table.HasValue(PS.HF, mdl) then
@@ -828,7 +829,7 @@ function GM:EntityTakeDamage(ent, dmginfo)
 					else
 						snd = table.Random(PS.Medium)
 					end
-					
+
 					vol = 85
 				else
 					if table.HasValue(PS.HF, mdl) then
@@ -842,15 +843,15 @@ function GM:EntityTakeDamage(ent, dmginfo)
 					else
 						snd = table.Random(PS.High)
 					end
-					
+
 					vol = 90
 				end
-				
+
 				ent:EmitSound(snd, vol)
 				ent.PainDelay = CT + math.Rand(0.7, 1.1)
 			end
 		end
-		
+
 		ent.SuppressPain = true
 	end
 end
@@ -866,39 +867,39 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 	rag:Spawn()
 	rag:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 	rag:SetVelocity(ply:GetVelocity())
-	
+
 	isply = attacker:IsPlayer()
 	isval = attacker:IsValid()
 
 	for k = 1, rag:GetPhysicsObjectCount() do
 		phys = rag:GetPhysicsObjectNum(k)
-		
+
 		if IsValid(phys) then
 			pos, ang = ply:GetBonePosition(rag:TranslatePhysBoneToBone(k))
 			phys:SetPos(pos)
 			phys:SetAngles(ang)
-			
+
 			if isval and isply then
 				phys:SetVelocity(phys:GetMass() * 10 * attacker:GetAimVector())
 			end
 		end
 	end
-	
+
 	rag.DeadPlayer = true
 	rag.RealPlayer = ply
 	rag.KillTime = CurTime()
-	
+
 	if isply then
 		rag.FingerPrint = attacker.FingerPrint
 	end
-	
+
 	rag.Killer = attacker
 	rag.Analyzers = {}
-	
+
 	if ply.IDType == 1 then
 		rag.IDType = 1
 	end
-	
+
 	if ply.IsVIP then
 		rag.Role = 3
 	elseif ply.IsAgent then
@@ -906,28 +907,28 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 	else
 		rag.Role = 1
 	end
-	
+
 	ply.Ragdoll = rag
 	ply:AddDeaths(1)
-	
+
 	rag.KillCaliber = "Clumsiness"
-	
+
 	if isval and isply then
 		rag.KillCaliber = attacker:GetActiveWeapon().Caliber
-		
+
 		if (attacker == ply) then
 			attacker:AddFrags(-1)
 		else
 			attacker:AddFrags(1)
 		end
 	end
-	
+
 	if GameStarted then
 		if attacker:IsValid() and attacker:IsPlayer() then
 			umsg.Start("KILLPLAYER", attacker)
 				umsg.Entity(ply)
 			umsg.End()
-			
+
 			if attacker.IsAgent then
 				if ply.IsVIP then
 					attacker:IncreaseKarma(5)
@@ -942,7 +943,7 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 						else
 							attacker.ArmedKills = attacker.ArmedKills + 1
 							maxk = GetConVarNumber("dec_max_armedkills")
-						
+
 							if attacker.ArmedKills > maxk then
 								attacker:DecreaseKarma(10)
 							elseif attacker.ArmedKills == maxk then
@@ -966,7 +967,7 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 					end
 				end
 			end
-			
+
 			if ply.IsVIP then
 				VIP = nil
 			elseif ply == AgentA then
@@ -974,7 +975,7 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 			elseif ply == AgentB then
 				AgentB = nil
 			end
-			
+
 			if IsValid(VIP) then
 				if not IsValid(AgentA) and not IsValid(AgentB) then
 					self:EndRound(1)
@@ -994,7 +995,7 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 			elseif ply == AgentB then
 				AgentB = nil
 			end
-			
+
 			if VIP then
 				if not AgentA and not AgentB then
 					self:EndRound(1)
@@ -1008,9 +1009,9 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 			end
 		end
 	end
-	
+
 	ply.ExamTarget = nil
-	
+
 	if isval and isply then
 		if attacker:GetDTInt(1) < 60 then
 			if not attacker:IsAdmin() and not attacker:IsSuperAdmin() then
@@ -1018,16 +1019,16 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 			end
 		end
 	end
-	
+
 	ply:DropEverything()
-	
+
 	if IsValid(ply.CarryEnt) then
 		ply:DropObject(ply.CarryEnt)
 	end
-	
+
 	if not ply.SuppressPain then
 		mdl = ply:GetModel()
-		
+
 		if table.HasValue(PS.HF, mdl) then
 			sound = table.Random(PS.HFD)
 		elseif table.HasValue(PS.Z, mdl) then
@@ -1039,10 +1040,10 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 		else
 			sound = table.Random(PS.HMD)
 		end
-		
+
 		ply:EmitSound(sound, 95)
 	end
-	
+
 	ply:SetDTInt(3, 100)
 end
 
@@ -1070,7 +1071,7 @@ local found
 
 function GM:KeyPress(ply, key)
 	CT = CurTime()
-	
+
 	if not ply:Alive() then
 		if key == IN_ATTACK2 then
 			if CT > ply.SpookySoundTime then
@@ -1078,24 +1079,24 @@ function GM:KeyPress(ply, key)
 				ply.SpookySoundTime = CT + 5
 			end
 		end
-		
+
 		return
 	end
-	
+
 	if CT < ply.ActionTime then
 		return
 	end
-	
+
 	if key == IN_USE then
 		td = {}
-		
+
 		td.start = ply:GetShootPos()
 		td.endpos = td.start + ply:GetAimVector() * 80
 		td.filter = ply
-		
+
 		trace = util.TraceLine(td)
 		ent = trace.Entity
-		
+
 		if IsValid(ent) and ent:GetClass() == "prop_ragdoll" then
 			if ent.DeadPlayer then
 				umsg.Start("EXAMINE_DEADBODY", ply)
@@ -1104,7 +1105,7 @@ function GM:KeyPress(ply, key)
 					umsg.Short(ent.KillTime)
 					umsg.Short(ent.Role)
 				umsg.End()
-				
+
 				if GameStarted then
 					if not ent.Reported then
 						if not ply.IsAgent then
@@ -1112,9 +1113,9 @@ function GM:KeyPress(ply, key)
 								umsg.Entity(ent.RealPlayer)
 								umsg.Short(ent.Role)
 							umsg.End()
-							
+
 							ent.Reported = true
-							
+
 							if ply.IsVIP then
 								if ent.IDType == 1 then
 									ply.IDType = 1
@@ -1126,28 +1127,28 @@ function GM:KeyPress(ply, key)
 							if not ent.Confirmed then
 								if ent.Role == 3 then
 									amt = GetConVarNumber("dec_confirm_vip")
-									
+
 									umsg.Start("CONFIRM_VIP", ply)
 										umsg.Short(amt)
 									umsg.End()
-									
+
 									ply:SetDTInt(0, ply:GetDTInt(0) + amt, 0, MoneyCap)
 								elseif ent.Role == 2 then
 									amt = GetConVarNumber("dec_confirm_agent")
-									
+
 									umsg.Start("CONFIRM_AGENT", ply)
 										umsg.Short(amt)
 									umsg.End()
-									
+
 									ply:SetDTInt(0, ply:GetDTInt(0) + amt, 0, MoneyCap)
 								end
-								
+
 								ent.Confirmed = true
 							end
-							
-							if not ent.Reported then 
+
+							if not ent.Reported then
 								found = false
-								
+
 								for k, v in pairs(ents.FindInSphere(ply:GetShootPos(), 256)) do
 									if IsValid(v) then
 										if v:IsPlayer() then
@@ -1158,13 +1159,13 @@ function GM:KeyPress(ply, key)
 										end
 									end
 								end
-								
+
 								if found then
 									umsg.Start("REPORT_DEADPLAYER")
 										umsg.Entity(ent.RealPlayer)
 										umsg.Short(ent.Role)
 									umsg.End()
-									
+
 									ent.Reported = true
 								else
 									umsg.Start("KILLPLAYER", attacker)
@@ -1172,17 +1173,17 @@ function GM:KeyPress(ply, key)
 									umsg.End()
 								end
 							end
-							
+
 							ply.DeadBody = ent
 						end
 					end
 				end
-				
+
 				ply.ActionTime = CT + 1
 			end
 		end
 	end
-	
+
 	if key == IN_JUMP then
 		if ply:GetJumpPower() > 0 then
 			if ply:OnGround() then
@@ -1190,7 +1191,7 @@ function GM:KeyPress(ply, key)
 				ply.StaminaRegenTime = CT + 3
 			end
 		end
-		
+
 		if ply:GetMoveType() == MOVETYPE_NONE then
 			ply:SetMoveType(MOVETYPE_WALK)
 			ply:SetLocalVelocity(ply.GrabHitNormal * -100 + Vector(0, 0, 250))
@@ -1201,7 +1202,7 @@ function GM:KeyPress(ply, key)
 			ply.StaminaRegenTime = CT + 3
 		end
 	end
-	
+
 	if key == IN_DUCK then
 		if CT > ply.GrabTime then
 			if ply.HasGrabbed then
@@ -1221,58 +1222,58 @@ end
 
 function GM:CanStartRound()
 	ply = player.GetAll()
-	
+
 	for k, v in pairs(ply) do
 		if not v:Alive() then
 			ply[k] = nil
 		end
 	end
-	
+
 	table.Sanitise(ply)
-	
+
 	if #ply < 3 then
 		return false
 	end
-	
+
 	return true
 end
 
 function GM:AttemptSelection()
 	GameStarted = true
 	time = 15
-	
+
 	if FirstRound then
 		time = 30
 	end
-	
+
 	timer.Simple(time, function()
 		if not self:CanStartRound() then
 			GameStarted = false
 			return
 		end
-		
+
 		ply = player.GetAll()
-		
+
 		for k, v in pairs(ply) do
 			if not v:Alive() then
 				ply[k] = nil
 			end
 		end
-		
+
 		table.Sanitise(ply)
-		
+
 		CanBuy = true
-		
+
 		GameStartTime = CurTime()
 		RT = GetConVarNumber("dec_roundtime")
-		
+
 		timetosend = (GameStartTime - CurTime()) + RT
 		print(timetosend)
-		
+
 		umsg.Start("ROUNDTIME")
 			umsg.Long(timetosend)
 		umsg.End()
-		
+
 		if #ply >= 6 then
 			if LastPeople then
 				for k, v in pairs(ply) do
@@ -1284,7 +1285,7 @@ function GM:AttemptSelection()
 				end
 			end
 		end
-		
+
 		rand = math.random(1, #ply)
 		AgentA = ply[rand]
 		table.remove(ply, rand)
@@ -1294,7 +1295,7 @@ function GM:AttemptSelection()
 		AgentA.InexperienceRatio = 1
 		AgentA.DetectionAmount = 5
 		AgentA.AgencyHelp = 3
-		
+
 		rand = math.random(1, #ply)
 		AgentB = ply[rand]
 		table.remove(ply, rand)
@@ -1304,38 +1305,38 @@ function GM:AttemptSelection()
 		AgentB.InexperienceRatio = 1
 		AgentB.DetectionAmount = 5
 		AgentB.AgencyHelp = 3
-		
+
 		rand = math.random(1, #ply)
 		VIP = ply[rand]
 		table.remove(ply, rand)
 		VIP:SetDTInt(0, GetConVarNumber("dec_startmoney_vip") * (VIP:GetDTInt(1) / 100))
 		VIP.Income = GetConVarNumber("dec_income_vip_amount")
 		VIP.IncomeTime = GetConVarNumber("dec_income_vip_time")
-		
+
 		MsgN("agent A " .. AgentA:Nick())
 		MsgN("agent B " .. AgentB:Nick())
 		MsgN("VIP " .. VIP:Nick())
-		
+
 		AgentA.IsAgent = true
 		AgentB.IsAgent = true
 		VIP.IsVIP = true
 		VIP.IDType = 1
-		
+
 		if #player.GetAll() >= 6 then -- we need another player.GetAll(), because the local "ply" does not contain all players
 			LastPeople = {}
 			table.insert(LastPeople, AgentA)
 			table.insert(LastPeople, AgentB)
 			table.insert(LastPeople, VIP)
 		end
-		
+
 		SendUserMessage("AGENT", AgentA)
 		SendUserMessage("AGENT", AgentB)
 		SendUserMessage("VIP", VIP)
-		
+
 		AgentA.RoleSendTime = CT + 1
 		AgentB.RoleSendTime = CT + 1
 		VIP.RoleSendTime = CT + 1
-		
+
 		timer.Create("VIPWins", RT, 1, function()
 			if not VIP then
 				if AgentA and AgentB then
@@ -1345,7 +1346,7 @@ function GM:AttemptSelection()
 				self:EndRound(1)
 			end
 		end)
-		
+
 		FirstRound = false
 	end)
 end
@@ -1358,19 +1359,19 @@ function GM:EndRound(num, ent)
 	MR = GetConVarNumber("dec_rounds")
 	RoundsPlayed = RoundsPlayed + 1
 	ply = player.GetAll()
-	
+
 	if num == 1 then
 		umsg.Start("WIN_VIP")
 			umsg.Short(RoundsPlayed)
 			umsg.Short(MR)
 		umsg.End()
-		
+
 		for k, v in pairs(ply) do
 			if not v.IsAgent and not v.IsVIP and v:Alive() then
 				v:IncreaseKarma(5)
 			end
 		end
-		
+
 	elseif num == 2 then
 		umsg.Start("WIN_AGENT")
 			umsg.Entity(ent)
@@ -1382,30 +1383,30 @@ function GM:EndRound(num, ent)
 			umsg.Short(RoundsPlayed)
 			umsg.Short(MR)
 		umsg.End()
-		
+
 	elseif num == 4 then
 		umsg.Start("ROUNDRESTART")
 			umsg.Short(RoundsPlayed)
 			umsg.Short(MR)
 		umsg.End()
 	end
-	
+
 	GameStarted = false
 	CanBuy = false
 	spawns = nil
-	
+
 	for k, v in pairs(ply) do
 		v:StripWeapons()
 		v:SetFOV(0, 0.3)
 	end
-	
+
 	if RoundsPlayed <= MR then
 		timer.Simple(14, function()
 			for k, v in pairs(ents.FindByClass("prop_ragdoll")) do
 				SafeRemoveEntity(v)
 			end
 		end)
-		
+
 		timer.Simple(15, function()
 			self:RestartRound()
 		end)
@@ -1417,7 +1418,7 @@ end
 
 function GM:RestartRound()
 	game.CleanUpMap()
-	
+
 	for k, v in pairs(player.GetAll()) do
 		v.IsAgent = false
 		v.IsVIP = false
@@ -1425,15 +1426,15 @@ function GM:RestartRound()
 		v.AgencyHelp = 0
 		v.NonVIPPlayers = nil
 		v.Mail = {}
-		
+
 		if v.Ragdoll then
 			SafeRemoveEntity(v.Ragdoll)
 		end
-		
+
 		v.Ragdoll = nil
 		v:Spawn()
 	end
-	
+
 	self:CreateEnts()
 end
 
@@ -1441,29 +1442,29 @@ local function DEC_PerformAction(ply)
 	if not CanBuy then
 		return
 	end
-	
+
 	CT = CurTime()
-	
+
 	if CT < ply.ActionTime then
 		return
 	end
 
 	if ply:KeyDown(IN_USE) then
-		if ply.IsVIP then	
+		if ply.IsVIP then
 			if ply.IDType == 1 then
 				td = {}
 				td.start = ply:GetShootPos()
 				td.endpos = td.start + ply:GetAimVector() * 256
 				td.filter = ply
-				
+
 				trace = util.TraceLine(td)
-				
+
 				if trace.Hit then
 					if trace.Entity:IsPlayer() then
 						umsg.Start("VIP_SHOW", trace.Entity)
 							umsg.Entity(ply)
 						umsg.End()
-						
+
 						umsg.Start("VIP_SHOWN", ply)
 							umsg.Entity(trace.Entity)
 						umsg.End()
@@ -1478,15 +1479,15 @@ local function DEC_PerformAction(ply)
 				td.start = ply:GetShootPos()
 				td.endpos = td.start + ply:GetAimVector() * 256
 				td.filter = ply
-				
+
 				trace = util.TraceLine(td)
-				
+
 				if trace.Hit then
 					if trace.Entity:IsPlayer() then
 						umsg.Start("VIP_SHOW", trace.Entity)
 							umsg.Entity(ply)
 						umsg.End()
-						
+
 						umsg.Start("VIP_SHOWN", ply)
 							umsg.Entity(trace.Entity)
 						umsg.End()
@@ -1498,16 +1499,16 @@ local function DEC_PerformAction(ply)
 				td.start = ply:GetShootPos()
 				td.endpos = td.start + ply:GetAimVector() * 256
 				td.filter = ply
-				
+
 				trace = util.TraceLine(td)
-				
+
 				if trace.Hit then
 					if trace.Entity:IsPlayer() then
 						if not trace.Entity.IsAgent and not trace.Entity.IsVIP then
 							umsg.Start("VIP_SHOW", trace.Entity)
 								umsg.Entity(ply)
 							umsg.End()
-							
+
 							umsg.Start("VIP_SHOWN_FAKE", ply)
 								umsg.Entity(trace.Entity)
 							umsg.End()
@@ -1515,7 +1516,7 @@ local function DEC_PerformAction(ply)
 							umsg.Start("VIP_SHOW_FAKE", trace.Entity)
 								umsg.Entity(ply)
 							umsg.End()
-							
+
 							umsg.Start("VIP_SHOWN_FAKE", ply)
 								umsg.Entity(trace.Entity)
 							umsg.End()
@@ -1524,48 +1525,48 @@ local function DEC_PerformAction(ply)
 				end
 			end
 		end
-		
+
 		ply.ActionTime = CT + 1
-		
+
 		return
 	end
-	
+
 	if IsValid(ply.CarryEnt) then
 		ply:DropObject(ply.CarryEnt)
 		ply.CarryEnt = nil
 		return
 	end
-	
+
 	td = {}
 	td.start = ply:GetShootPos()
 	td.endpos = td.start + ply:GetAimVector() * 256
 	td.filter = ply
-		
+
 	trace = util.TraceLine(td)
-	
+
 	if trace.Hit then
 		cl = trace.Entity:GetClass()
-		
+
 		if trace.Entity:IsPlayer() then
 			aim = ply:GetAimVector()
 			aim = Vector(aim.x, aim.y)
-			
+
 			haim = trace.Entity:GetAimVector()
 			haim = Vector(haim.x, haim.y, 0)
-			
+
 			dot = aim:DotProduct(haim)
-			
+
 			if dot > 0.6 and ply.IsAgent then
 				if CT > ply.PickpocketDelay then
-					dist = td.start:Distance(trace.Entity:GetShootPos()) 
-					
+					dist = td.start:Distance(trace.Entity:GetShootPos())
+
 					if dist < 60 then -- didn't want to use another trace, so I'll just distance it instead
 						if trace.Entity:GetVelocity():Length() == 0 then
 							if trace.Entity.IsVIP then
 								umsg.Start("PICKPOCKET_VIP", ply)
 									umsg.Entity(trace.Entity)
 								umsg.End()
-								
+
 								trace.Entity.IDType = 0
 								ply.IDType = 1
 							elseif trace.Entity.IsAgent then
@@ -1576,15 +1577,15 @@ local function DEC_PerformAction(ply)
 								else
 									SendUserMessage("PICKPOCKET_NONE", ply)
 								end
-								
+
 								trace.Entity.IDType = 0
 							else
 								SendUserMessage("PICKPOCKET_NONE", ply)
 							end
-							
+
 							ply.PickpocketDelay = CT + 10
 						end
-						
+
 						ply:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_GMOD_GESTURE_ITEM_PLACE, true)
 					end
 				end
@@ -1594,35 +1595,35 @@ local function DEC_PerformAction(ply)
 						umsg.Start("EXAMINE_WIELDING", ply)
 							umsg.Entity(trace.Entity)
 						umsg.End()
-						
+
 						ply.ActionTime = CT + 1
-						
+
 						return
 					end
 				end
-				
+
 				if not ply.ExamTarget then
 					ply.ExamTarget = trace.Entity
 					ply.ExamFinish = CT + ply.ExamTime
-							
+
 					umsg.Start("EXAMINE_START", ply)
 						umsg.Entity(ply.ExamTarget)
 						umsg.Short(ply.ExamTime)
 					umsg.End()
-					
+
 					ply.ActionTime = CT + 1
 				end
 			end
 		elseif cl == "prop_ragdoll" then
-			dist = td.start:Distance(trace.Entity:GetPos()) 
-			
+			dist = td.start:Distance(trace.Entity:GetPos())
+
 			if dist <= 50 then
 				ply:PickupObject(trace.Entity)
 				ply.CarryEnt = trace.Entity
 			end
 		elseif cl == "dec_weapon" then
-			dist = td.start:Distance(trace.Entity:GetPos()) 
-			
+			dist = td.start:Distance(trace.Entity:GetPos())
+
 			if dist <= 70 then
 				trace.Entity:Unload(ply)
 			end
@@ -1632,8 +1633,8 @@ local function DEC_PerformAction(ply)
 			ply:EmitSound(table.Random(ShatterGlass), 80, math.random(95, 105))
 			ply.ActionTime = CT + 0.5
 		elseif cl == "func_breakable_surf" then
-			dist = td.start:Distance(trace.HitPos) 
-			
+			dist = td.start:Distance(trace.HitPos)
+
 			if dist <= 55 then
 				trace.Entity:Input("Shatter", NULL, NULL, "")
 				ply:EmitSound("ambient/voices/citizen_punches2.wav", 70, math.random(95, 105))
@@ -1648,12 +1649,12 @@ concommand.Add("dec_action", DEC_PerformAction)
 
 local function DEC_BuyItem(ply, com, args)
 	mailboxes = #ents.FindByClass("dec_mailbox")
-	
+
 	if mailboxes > 0 then
 		if not ply.Mail then
 			ply.Mail = {}
 		end
-		
+
 		if #ply.Mail >= 4 then
 			SendUserMessage("MAILFULL", ply)
 			return
@@ -1665,29 +1666,29 @@ local function DEC_BuyItem(ply, com, args)
 	end
 
 	item = args[1]
-	
+
 	if not item then
 		return
 	end
-	
+
 	item = tonumber(item)
-	
+
 	dosh = ply:GetDTInt(0)
-	
+
 	if dosh <= 0 then
 		SendUserMessage("NOMONEY", ply)
 		return
 	end
-	
+
 	for k, v in pairs(Items) do
 		if v.num == item then
 			cb = v.CanBuy(ply)
-			
+
 			if cb == 1 then
 				if dosh - v.Price >= 0 then
 					if mailboxes > 0 then
 						inserted = table.insert(ply.Mail, k)
-					
+
 						umsg.Start("MAILITEM", ply)
 							umsg.Short(inserted)
 							umsg.Short(k)
@@ -1695,7 +1696,7 @@ local function DEC_BuyItem(ply, com, args)
 					else
 						v.BuyFunc(ply)
 					end
-					
+
 					ply:SetDTInt(0, dosh - v.Price)
 					break
 				else
@@ -1720,7 +1721,7 @@ function PLAYER:HasItemNum(num)
 			return true
 		end
 	end
-	
+
 	return false
 end
 
@@ -1728,7 +1729,7 @@ function PLAYER:AddCarryable(num)
 	for k, v in pairs(Carryables) do
 		if v.num == num then
 			table.insert(self.Items, {num = v.num, cuf = v.canusefunc, uf = v.usefunc})
-			
+
 			umsg.Start("GETCARRY", self)
 				umsg.Short(v.num)
 			umsg.End()
@@ -1739,33 +1740,33 @@ end
 function PLAYER:CanGiveAmmo(ammo)
 	amt = self:GetAmmoCount(ammo)
 	cap = AmmoLimit[ammo]
-	
+
 	if amt == cap then
 		return false
 	end
-	
+
 	return true
 end
 
 function PLAYER:GetRemainingAmmo(num, ammo)
 	amt = self:GetAmmoCount(ammo)
 	cap = AmmoLimit[ammo]
-	
+
 	if amt + num >= cap then
 		return cap - amt
 	end
-	
-	return 0 
+
+	return 0
 end
 
 function PLAYER:GiveAmmoCap(num, ammo)
 	amt = self:GetAmmoCount(ammo)
 	cap = AmmoLimit[ammo]
-	
+
 	if amt == cap then
 		return
 	end
-	
+
 	if amt + num <= cap then
 		self:GiveAmmo(num, ammo)
 	else
@@ -1776,7 +1777,7 @@ end
 function PLAYER:PositionMe()
 	if not spawns then
 		spawns = {}
-		
+
 		t = ents.FindByClass("info_player_terrorist")
 		ct = ents.FindByClass("info_player_counterterrorist")
 		def = ents.FindByClass("info_player_start")
@@ -1784,16 +1785,16 @@ function PLAYER:PositionMe()
 		for k, v in pairs(t) do
 			table.insert(spawns, v)
 		end
-		
+
 		for k, v in pairs(ct) do
 			table.insert(spawns, v)
 		end
-		
+
 		for k, v in pairs(def) do
 			table.insert(spawns, v)
 		end
 	end
-	
+
 	randpos = math.random(1, #spawns)
 	self:SetPos(spawns[randpos]:GetPos())
 	table.remove(spawns, randpos)
@@ -1813,7 +1814,7 @@ end
 
 function PLAYER:SaveKarma()
 	karma = self:GetPData("DEC_Karma")
-	
+
 	if not karma then
 		self:SetPData("DEC_Karma", 100)
 	else
@@ -1823,7 +1824,7 @@ end
 
 function PLAYER:LoadKarma()
 	karma = self:GetPData("DEC_Karma")
-	
+
 	if not karma then
 		self:SetPData("DEC_Karma", 100)
 		self:SetDTInt(1, 100)
@@ -1836,10 +1837,10 @@ local id, dur
 
 function PLAYER:Punish()
 	self:SetPData("DEC_Karma", 100)
-	
+
 	id = self:SteamID()
 	dur = tostring(GetConVarNumber("dec_bandur"))
-	
+
 	game.ConsoleCommand(string.format("kickid %s %s\n", id, "Karma too low - " .. dur .. " minute ban."))
 	game.ConsoleCommand(string.format("banid %s %s kick\n", dur, id))
 	game.ConsoleCommand("writeid\n")
@@ -1849,12 +1850,12 @@ function PLAYER:DropWep()
 	if not IsValid(self:GetActiveWeapon()) then
 		return
 	end
-	
+
 	td = {}
 	td.start = self:GetShootPos()
 	td.endpos = td.start + self:GetAimVector() * 40
 	td.filter = self
-	
+
 	trace = util.TraceHull(td)
 	mywep = self:GetActiveWeapon()
 	wepclass = mywep:GetClass()
@@ -1870,18 +1871,18 @@ function PLAYER:DropWep()
 	wep.AmmoType = mywep.Primary.Ammo
 	wep.CanUnload = mywep.CanUnload
 	wep.Unique = mywep.Unique
-	
+
 	phys = wep:GetPhysicsObject()
 
 	if phys and phys:IsValid() then
 		phys:Wake()
 	end
-	
+
 	if (!mywep.Size) then
 		print("INVALID SIZE! FIX BLYAT")
 	end
 	self.Weight = self.Weight - (mywep.Size or 5)
-	
+
 	self:StripWeapon(wepclass)
 end
 
@@ -1901,13 +1902,13 @@ function PLAYER:DropEverything()
 		wep.Ammo = v:Clip1()
 		wep.AmmoType = v.Primary.Ammo
 		wep.CanUnload = v.CanUnload
-		
+
 		phys = wep:GetPhysicsObject()
 
 		if phys and phys:IsValid() then
 			phys:Wake()
 		end
-		
+
 		wep:SetVelocity(self:GetVelocity())
 	end
 end
@@ -1922,23 +1923,23 @@ function PLAYER:AttemptGrab()
 	if self:Health() <= 20 then
 		return
 	end
-	
+
 	if self:GetMoveType() != MOVETYPE_WALK then
 		return
 	end
-	
+
 	if self:GetVelocity():Length() >= 1100 then
 		return
 	end
-	
+
 	if self:Crouching() then
 		return
 	end
-	
+
 	if CurTime() < self.GrabTime then
 		return
 	end
-	
+
 	if self:GetDTInt(2) <= 15 then
 		return
 	end
@@ -1946,42 +1947,42 @@ function PLAYER:AttemptGrab()
 	SP = self:GetShootPos()
 	aim = self:GetAimVector()
 	td = {}
-	
+
 	td.start = SP
 	td.endpos = td.start + Vector(aim.x, aim.y, 0) * 32
 	td.filter = self
-	
+
 	trace1 = util.TraceLine(td)
-	
+
 	if IsValid(trace1.Entity) then
 		cl = trace1.Entity:GetClass()
-		
+
 		if cl == "prop_physics" or cl == "prop_ragdoll" then
 			if trace1.Entity:GetPhysicsObject():IsMoveable() then
 				return
 			end
 		end
 	end
-	
+
 	if trace1.Hit and not trace1.Entity:IsPlayer() then
 		td = {}
-		
+
 		td.start = SP
 		td.endpos = td.start + Vector(aim.x, aim.y, 0.5) * 32
 		td.filter = self
-		
+
 		trace2 = util.TraceLine(td)
-		
+
 		if IsValid(trace2.Entity) then
 			cl = trace2.Entity:GetClass()
-			
+
 			if cl == "prop_physics" or cl == "prop_ragdoll" then
 				if trace2.Entity:GetPhysicsObject():IsMoveable() then
 					return
 				end
 			end
 		end
-		
+
 		if not trace2.Hit and not trace2.Entity:IsPlayer() then
 			self.GrabHitNormal = trace1.HitNormal
 			self:SetPos(trace1.HitPos - Vector(0, 0, 62))
@@ -1997,87 +1998,87 @@ end
 
 function PLAYER:CountWeapons()
 	amt = 0
-	
+
 	for k, v in pairs(self:GetWeapons()) do
 		if v.TakesUpSlot then
 			amt = amt + 1
 		end
 	end
-	
+
 	return amt
 end
 
 function PLAYER:CountUniqueWeapons()
 	amt = 0
-	
+
 	for k, v in pairs(self:GetWeapons()) do
 		if v.Unique then
 			amt = amt + 1
 		end
 	end
-	
+
 	return amt
 end
 
 local function DEC_RetrieveMail(ply, com, args)
 	Proceed = false
-	
+
 	for k, v in pairs(ents.FindInSphere(ply:GetPos(), 64)) do
 		if v:GetClass() == "dec_mailbox" then
 			Proceed = true
 		end
 	end
-	
+
 	if not Proceed then
 		return
 	end
-	
+
 	if not ply.Mail then
 		SendUserMessage("NOMAIL", self)
 		return
 	end
-	
+
 	item = args[1]
-	
+
 	if not item then
 		return
 	end
-	
+
 	item = tonumber(item)
-	
+
 	itm = Items[ply.Mail[item]]
-	
+
 	if itm.Weapon then
 		if ply:CountWeapons() >= GetConVarNumber("dec_maxweapons") then
 			SendUserMessage("NOSPACE", ply)
 			return
 		end
-		
+
 		cb = itm.CanBuy(ply)
-		
+
 		if cb == 2 then
 			SendUserMessage("HAVEITEM", ply)
 			return
 		end
 	end
-	
+
 	if itm.Unique then
 		if ply:CountUniqueWeapons() >= GetConVarNumber("dec_maxweapons_unique") then
 			SendUserMessage("NOSPACE", ply)
 			return
 		end
-		
+
 		cb = itm.CanBuy(ply)
-		
+
 		if cb == 2 then
 			SendUserMessage("HAVEITEM", ply)
 			return
 		end
 	end
-	
+
 	itm.BuyFunc(ply)
 	table.remove(ply.Mail, item)
-	
+
 	umsg.Start("MAILRETRIEVED", ply)
 		umsg.Short(item)
 	umsg.End()
@@ -2087,21 +2088,21 @@ concommand.Add("dec_retrievemail", DEC_RetrieveMail)
 
 local function DEC_UseRadio(ply, com, args)
 	CT = CurTime()
-	
+
 	if not ply:Alive() or not ply.HasWalkieTalkie or CT < ply.RadioDelay then
 		return
 	end
-	
+
 	rtype = args[1]
 	rcat = args[2]
 	rsound = args[3]
-	
+
 	if not rtype or not rcat or not rsound then
 		return
 	end
-	
+
 	rtype, rcat, rsound = tonumber(rtype), tonumber(rcat), tonumber(rsound)
-	
+
 	for k, v in pairs(player.GetAll()) do
 		if v:Alive() and v.HasWalkieTalkie and v.Channel == ply.Channel then
 			umsg.Start("RADIO", v)
@@ -2112,7 +2113,7 @@ local function DEC_UseRadio(ply, com, args)
 			umsg.End()
 		end
 	end
-	
+
 	ply.RadioDelay = CT + 2
 end
 
@@ -2122,16 +2123,16 @@ local function DEC_Channel_Join(ply, com, args)
 	if not ply:Alive() or not ply.HasWalkieTalkie then
 		return
 	end
-	
+
 	chan = args[1]
 	pass = args[2]
-	
+
 	if not chan or not pass then
 		return
 	end
-	
+
 	joinchan = Channels[chan]
-	
+
 	if joinchan then
 		if joinchan.password then
 			if pass == joinchan.password then
@@ -2155,17 +2156,17 @@ local function DEC_Channel_Create(ply, com, args)
 	if not ply:Alive() or not ply.HasWalkieTalkie then
 		return
 	end
-	
+
 	chan = args[1]
 	mpass = args[2]
 	pass = args[3]
-	
+
 	if not chan or not mpass or not pass then
 		return
 	end
-	
+
 	joinchan = Channels[chan]
-	
+
 	if not joinchan then
 		Channels[chan] = {password = pass, masterpassword = mpass, deletable = true}
 		ply.Channel = chan
@@ -2181,16 +2182,16 @@ local function DEC_Channel_Delete(ply, com, args)
 	if not ply:Alive() or not ply.HasWalkieTalkie then
 		return
 	end
-	
+
 	chan = args[1]
 	mpass = args[2]
-	
+
 	if not chan or not mpass then
 		return
 	end
-	
+
 	joinchan = Channels[chan]
-	
+
 	if joinchan then
 		if mpass then
 			if mpass == joinchan.masterpassword then
@@ -2198,7 +2199,7 @@ local function DEC_Channel_Delete(ply, com, args)
 					if ply.Channel == chan then
 						ply.Channel = "channel1"
 					end
-					
+
 					Channels[chan] = nil
 					table.Sanitise(Channels)
 					SendUserMessage("CHANNEL_DELETED", ply)
@@ -2226,13 +2227,13 @@ local function DEC_ReportBody(ply)
 	if not GameStarted or not CanBuy then
 		return
 	end
-	
+
 	if not ply.IsAgent then
 		return
 	end
-	
+
 	ent = ply.DeadBody
-	
+
 	if ent and IsValid(ent) then
 		if not ent.Reported then
 			if ent:GetPos():Distance(ply:GetShootPos()) <= 80 then
@@ -2240,7 +2241,7 @@ local function DEC_ReportBody(ply)
 					umsg.Entity(ent.RealPlayer)
 					umsg.Short(ent.Role)
 				umsg.End()
-				
+
 				ply.DeadBody.Reported = true
 			end
 		end
@@ -2253,77 +2254,77 @@ local function DEC_GiveMoney(ply, com, args)
 	if not GameStarted or not CanBuy then
 		return
 	end
-	
+
 	dosh = args[1]
-	
+
 	if not dosh then
 		return
 	end
-	
+
 	CT = CurTime()
-	
+
 	if CT < ply.ActionTime then
 		return
 	end
-	
+
 	m = ply:GetDTInt(0)
 	dosh = math.Clamp(tonumber(dosh), 0, m)
-	
+
 	if dosh > m then
 		dosh = m
 	end
-	
+
 	if m < dosh then -- not gonna happen
 		return
 	end
-	
+
 	if dosh <= 0 then
 		return -- not gonna happen either, bro
 	end
-	
+
 	td = {}
 	td.start = ply:GetShootPos()
 	td.endpos = td.start + ply:GetAimVector() * 65
 	td.filter = ply
-	
+
 	trace = util.TraceLine(td)
-	
+
 	if trace.Hit and trace.Entity:IsPlayer() and trace.Entity:Alive() then
 		hm = trace.Entity:GetDTInt(0)
-		
+
 		if hm == MoneyCap then
 			umsg.Start("MONEY_FULL", ply)
 				umsg.Entity(trace.Entity)
 				umsg.Short(dosh)
 			umsg.End()
-			
+
 			umsg.Start("MONEY_FULL_ME", trace.Entity)
 				umsg.Entity(ply)
 				umsg.Short(dosh)
 			umsg.End()
-			
+
 			ply.ActionTime = CT + 0.75
-			
+
 			return
 		end
-		
+
 		if hm + dosh > MoneyCap then
 			dosh = MoneyCap - hm
 		end
-		
+
 		trace.Entity:SetDTInt(0, math.Clamp(hm + dosh, 0, MoneyCap))
 		ply:SetDTInt(0, math.Clamp(m - dosh, 0, MoneyCap))
-		
+
 		umsg.Start("MONEY_GIVE", ply)
 			umsg.Entity(trace.Entity)
 			umsg.Short(dosh)
 		umsg.End()
-		
+
 		umsg.Start("MONEY_RECEIVED", trace.Entity)
 			umsg.Entity(ply)
 			umsg.Short(dosh)
 		umsg.End()
-		
+
 		ply.ActionTime = CT + 0.75
 	end
 end
@@ -2332,13 +2333,13 @@ concommand.Add("dec_givemoney", DEC_GiveMoney)
 
 local function DEC_UseItem(ply, com, args)
 	num = args[1]
-	
+
 	if not num then
 		return
 	end
-	
+
 	num = tonumber(num)
-	
+
 	for k, v in pairs(ply.Items) do
 		if v.num == num then
 			if v.cuf(ply) then
