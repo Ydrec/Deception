@@ -2,7 +2,9 @@ Items = {}
 local NI
 
 function GM:RegisterItem(tbl)
-	table.insert(Items, {num = tbl.num, Name = tbl.Name, Category = tbl.Category, Description = tbl.Description, Model = tbl.Model, Stats = tbl.Stats, Price = tbl.Price, Weapon = tbl.Weapon, Unique = tbl.Unique, CanBuy = tbl.CanBuy, BuyFunc = tbl.BuyFunc, TeamText = (tbl.TeamText or {"Civilian", "Agent", "VIP"})})
+	local ItemData = {num = tbl.num, Name = tbl.Name, Category = tbl.Category, Description = tbl.Description, Model = tbl.Model, Stats = tbl.Stats, Price = tbl.Price, Weapon = tbl.Weapon, Unique = tbl.Unique, CanBuy = tbl.CanBuy, BuyFunc = tbl.BuyFunc, TeamText = (tbl.TeamText or {"Civilian", "Agent", "VIP"})}
+
+	table.insert(Items, ItemData)
 end
 
 NI = {}
@@ -18,7 +20,7 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_pistol_p228") then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -43,14 +45,14 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_pistol_glock18") then
 		return 1
 	end
-	
+
 	return 2
 end
 
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_pistol_glock18")
 	wep:SetClip1(20)
-	
+
 	ply:GiveAmmoCap(38, "pistol")
 end
 
@@ -69,14 +71,14 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_pistol_fiveseven") then
 		return 1
 	end
-	
+
 	return 2
 end
 
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_pistol_fiveseven")
 	wep:SetClip1(21)
-	
+
 	ply:GiveAmmoCap(40, "pistol")
 end
 
@@ -95,14 +97,14 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_pistol_deagle") then
 		return 1
 	end
-	
+
 	return 2
 end
 
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_pistol_deagle")
 	wep:SetClip1(8)
-	
+
 	ply:GiveAmmoCap(14, "pistol")
 end
 
@@ -121,14 +123,14 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_smg_mac10") then
 		return 1
 	end
-	
+
 	return 2
 end
 
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_smg_mac10")
 	wep:SetClip1(31)
-	
+
 	ply:GiveAmmoCap(30, "smg1")
 end
 
@@ -147,14 +149,14 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_smg_tmp") then
 		return 1
 	end
-	
+
 	return 2
 end
 
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_smg_tmp")
 	wep:SetClip1(31)
-	
+
 	ply:GiveAmmoCap(30, "smg1")
 end
 
@@ -173,14 +175,14 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_smg_mp5") then
 		return 1
 	end
-	
+
 	return 2
 end
 
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_smg_mp5")
 	wep:SetClip1(31)
-	
+
 	ply:GiveAmmoCap(30, "smg1")
 end
 
@@ -199,14 +201,14 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_smg_ump") then
 		return 1
 	end
-	
+
 	return 2
 end
 
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_smg_ump45")
 	wep:SetClip1(26)
-	
+
 	ply:GiveAmmoCap(25, "smg1")
 end
 
@@ -225,14 +227,14 @@ NI.CanBuy = function(ply)
 	if not ply:HasWeapon("dec_smg_p90") then
 		return 1
 	end
-	
+
 	return 2
 end
 
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_smg_p90")
 	wep:SetClip1(51)
-	
+
 	ply:GiveAmmoCap(50, "smg1")
 end
 
@@ -251,11 +253,11 @@ NI.CanBuy = function(ply)
 	if not ply.IsAgent then
 		return 3
 	end
-	
+
 	if not ply:HasWeapon("dec_melee_knife") then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -278,11 +280,11 @@ NI.CanBuy = function(ply)
 	if not ply.IsAgent then
 		return 3
 	end
-	
+
 	if not ply:HasWeapon("dec_dart_gun") then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -302,12 +304,12 @@ NI.Model = "models/Items/BoxSRounds.mdl"
 NI.Price = 48
 NI.CanBuy = function(ply)
 	local ac = ply:GetAmmoCount("pistol")
-	
+
 	if ac >= 96 then
 		SendUserMessage("AMMOFULL", ply)
 		return 3
 	end
-	
+
 	return 1
 end
 
@@ -326,12 +328,12 @@ NI.Model = "models/Items/BoxMRounds.mdl"
 NI.Price = 64
 NI.CanBuy = function(ply)
 	local ac = ply:GetAmmoCount("smg1")
-	
+
 	if ac >= 120 then
 		SendUserMessage("AMMOFULL", ply)
 		return 3
 	end
-	
+
 	return 1
 end
 
@@ -353,14 +355,14 @@ NI.CanBuy = function(ply)
 	if not ply.IsAgent then
 		return 3
 	end
-	
+
 	local ac = ply:GetAmmoCount("SniperRound")
-	
+
 	if ac >= 10 then
 		SendUserMessage("AMMOFULL", ply)
 		return 3
 	end
-	
+
 	return 1
 end
 
@@ -372,7 +374,7 @@ GM:RegisterItem(NI)
 
 NI = {}
 
-NI.num = 301 
+NI.num = 301
 NI.Name = "Flak vest"
 NI.Category = "Armor"
 NI.Description = "An easily concealable light flak vest.\nDecreases damage from bullets/melee by 15%\nDecreases run speed by 2%\nWill wear down over time."
@@ -382,7 +384,7 @@ NI.CanBuy = function(ply)
 	if ply.BodyArmDamageDec != 0.85 then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -392,7 +394,7 @@ NI.BuyFunc = function(ply)
 	ply:SetRunSpeed(GetConVarNumber("dec_runspeed") * 0.98)
 	ply.iRunSpeed = ply:GetRunSpeed()
 	ply.Weight = ply.Weight + 3
-	
+
 	umsg.Start("ARMOR", ply)
 		umsg.Short(100)
 		umsg.Short(1)
@@ -413,7 +415,7 @@ NI.CanBuy = function(ply)
 	if ply.BodyArmDamageDec != 0.75 then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -423,7 +425,7 @@ NI.BuyFunc = function(ply)
 	ply:SetRunSpeed(GetConVarNumber("dec_runspeed") * 0.965)
 	ply.iRunSpeed = ply:GetRunSpeed()
 	ply.Weight = ply.Weight + 4
-	
+
 	umsg.Start("ARMOR", ply)
 		umsg.Short(100)
 		umsg.Short(3)
@@ -444,7 +446,7 @@ NI.CanBuy = function(ply)
 	if ply.BodyArmDamageDec != 0.68 then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -454,7 +456,7 @@ NI.BuyFunc = function(ply)
 	ply:SetRunSpeed(GetConVarNumber("dec_runspeed") * 0.95)
 	ply.iRunSpeed = ply:GetRunSpeed()
 	ply.Weight = ply.Weight + 5
-	
+
 	umsg.Start("ARMOR", ply)
 		umsg.Short(100)
 		umsg.Short(2)
@@ -465,7 +467,7 @@ GM:RegisterItem(NI)
 
 NI = {}
 
-NI.num = 401 
+NI.num = 401
 NI.Name = "How to conceal your weapons"
 NI.Category = "Other"
 NI.Description = "Explains how to properly conceal your weapons.\nIncreases maximum items carried to become\nsuspicious upon examination.\nLasts one round."
@@ -475,7 +477,7 @@ NI.CanBuy = function(ply)
 	if ply.WeightDetection != 5 then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -487,7 +489,7 @@ GM:RegisterItem(NI)
 
 NI = {}
 
-NI.num = 402 
+NI.num = 402
 NI.Name = "How to detect concealation"
 NI.Category = "Other"
 NI.Description = "Explains how to detect concealed items\non people. Increases your examination skills.\nLasts one round."
@@ -497,7 +499,7 @@ NI.CanBuy = function(ply)
 	if ply.DetectionAmount != 5 then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -519,7 +521,7 @@ NI.CanBuy = function(ply)
 	if ply.ExamTime != 1 then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -531,7 +533,7 @@ GM:RegisterItem(NI)
 
 NI = {}
 
-NI.num = 404 
+NI.num = 404
 NI.Name = "Forged VIP ID card"
 NI.Category = "Other"
 NI.Description = "Allows you to show this fake VIP ID card.\nCan be used to fool civilians into believing you\nto kill the VIP and cause confusion.\nThe enemy agent and the VIP can notice that it's fake."
@@ -542,11 +544,11 @@ NI.CanBuy = function(ply)
 	if not ply.IsAgent then
 		return 3
 	end
-	
+
 	if ply.IDType == 0 then
 		return 1
 	end
-	
+
 	return 2
 end
 
@@ -559,7 +561,7 @@ GM:RegisterItem(NI)
 
 NI = {}
 
-NI.num = 405 
+NI.num = 405
 NI.Name = "Antidote"
 NI.Category = "Other"
 NI.Description = "Cures any contracted poisoning or disease.\nCannot purchase if not poisoned."
@@ -569,7 +571,7 @@ NI.CanBuy = function(ply)
 	if ply:HasItemNum(1) then
 		return 3
 	end
-	
+
 	return 1
 end
 
@@ -581,7 +583,7 @@ GM:RegisterItem(NI)
 
 NI = {}
 
-NI.num = 406 
+NI.num = 406
 NI.Name = "Medkit"
 NI.Category = "Other"
 NI.Description = "Restores 25 health points upon retrieval.\nRestores max. health regen by 10 points\nCannot buy if health is full.\nCannot use more than 2 medkits per round."
@@ -592,11 +594,11 @@ NI.CanBuy = function(ply)
 		SendUserMessage("MAXDOSE", ply)
 		return 3
 	end
-	
+
 	if ply:Health() == 100 then
 		return 3
 	end
-	
+
 	return 1
 end
 
@@ -621,14 +623,14 @@ NI.CanBuy = function(ply)
 	if ply.HasWalkieTalkie then
 		return 2
 	end
-	
+
 	return 1
 end
 
 NI.BuyFunc = function(ply)
 	ply.HasWalkieTalkie = true
 	SendUserMessage("BUY_WALKIETALKIE", ply)
-	
+
 	if not ply.Channel then
 		ply.Channel = "channel1"
 	end
@@ -650,11 +652,11 @@ NI.CanBuy = function(ply)
 	if ply.IsAgent then
 		return 2
 	end
-	
+
 	if ply:HasWeapon("dec_balanal") then
 		return 2
 	end
-	
+
 	return 1
 end
 
@@ -682,43 +684,51 @@ NI.CanBuy = function(ply)
 	if not ply.IsAgent then
 		return 3
 	end
-	
+
 	if ply.AgencyHelp == 0 then
 		SendUserMessage("AGENCY_NOHELP", ply)
 		return 3
 	end
-	
+
 	if not ply.NonVIPPlayers then
 		ply.NonVIPPlayers = player.GetAll()
-		
+
 		for k, v in pairs(ply.NonVIPPlayers) do
 			if v.IsVIP or not IsValid(v) or not v:Alive() or v == ply then
 				table.RemoveByValue(ply.NonVIPPlayers, v)
 			end
 		end
 	end
-	
+
 	if ply.NonVIPPlayers then
 		for k, v in pairs(ply.NonVIPPlayers) do
 			if not IsValid(v) or not v:Alive() or v == ply then
 				table.RemoveByValue(ply.NonVIPPlayers, v)
 			end
 		end
-		
+
 		if #ply.NonVIPPlayers == 0 then
 			SendUserMessage("AGENCY_NOHELP", ply)
 			return 3
 		end
 	end
-	
+
 	if #player.GetAll() < 5 then
 		umsg.Start("AGENCY_NOPEOPLE", ply)
 			umsg.Short(5)
 		umsg.End()
-	
+
 		return 3
 	end
-	
+
+	if (ply.HintsBought or 0) >= #ply.NonVIPPlayers then
+		SendUserMessage("AGENCY_NOHELP", ply)
+		print("Preventing bought from player " .. ply:Name() .. " due to max bought count reached")
+
+		return 3
+	end
+	ply.HintsBought = (ply.HintsBought or 0) + 1
+
 	return 1
 end
 
@@ -726,9 +736,13 @@ NI.BuyFunc = function(ply)
 	local rand = math.random(1, #ply.NonVIPPlayers)
 	local ent = ply.NonVIPPlayers[rand]
 	table.remove(ply.NonVIPPlayers, rand)
-	
+
 	ply.AgencyHelp = ply.AgencyHelp - 1
-	
+
+	if !IsValid(ent) then
+		return
+	end
+
 	umsg.Start("AGENCY_HELP_1", ply)
 		umsg.Entity(ent)
 	umsg.End()
@@ -750,47 +764,55 @@ NI.CanBuy = function(ply)
 		SendUserMessage("AGENCY_VIPDEAD", ply)
 		return 3
 	end
-	
+
 	if not ply.IsAgent then
 		return 3
 	end
-	
+
 	if ply.AgencyHelp == 0 then
 		SendUserMessage("AGENCY_NOHELP", ply)
 		return 3
 	end
-	
+
 	if not ply.NonVIPPlayers then
 		ply.NonVIPPlayers = player.GetAll()
-		
+
 		for k, v in pairs(ply.NonVIPPlayers) do
 			if v.IsVIP or not IsValid(v) or not v:Alive() or v == ply then
 				table.RemoveByValue(ply.NonVIPPlayers, v)
 			end
 		end
 	end
-	
+
 	if ply.NonVIPPlayers then
 		for k, v in pairs(ply.NonVIPPlayers) do
 			if not IsValid(v) or not v:Alive() or v == ply then
 				table.RemoveByValue(ply.NonVIPPlayers, v)
 			end
 		end
-		
+
 		if #ply.NonVIPPlayers < 2 then
 			SendUserMessage("AGENCY_NOHELP", ply)
 			return 3
 		end
 	end
-	
+
 	if #player.GetAll() < 9 then
 		umsg.Start("AGENCY_NOPEOPLE", ply)
 			umsg.Short(9)
 		umsg.End()
-		
+
 		return 3
 	end
-	
+
+	if (ply.HintsBought or 0) >= #ply.NonVIPPlayers then
+		SendUserMessage("AGENCY_NOHELP", ply)
+		print("Preventing bought from player " .. ply:Name() .. " due to max bought count reached")
+
+		return 3
+	end
+	ply.HintsBought = (ply.HintsBought or 0) + 2
+
 	return 1
 end
 
@@ -798,13 +820,24 @@ NI.BuyFunc = function(ply)
 	local rand = math.random(1, #ply.NonVIPPlayers)
 	local ent = ply.NonVIPPlayers[rand]
 	table.remove(ply.NonVIPPlayers, rand)
-	
+
 	local rand2 = math.random(1, #ply.NonVIPPlayers)
 	local ent2 = ply.NonVIPPlayers[rand2]
 	table.remove(ply.NonVIPPlayers, rand2)
-	
+
 	ply.AgencyHelp = ply.AgencyHelp - 1
-	
+
+	if !IsValid(ent) then
+		return
+	end
+
+	if !IsValid(ent2) then
+		umsg.Start("AGENCY_HELP_1", ply)
+			umsg.Entity(ent)
+		umsg.End()
+		return
+	end
+
 	umsg.Start("AGENCY_HELP_2", ply)
 		umsg.Entity(ent)
 		umsg.Entity(ent2)
