@@ -102,34 +102,36 @@ function SWEP:Think()
 
 	local DTInt3 = self:GetDTInt(3)
 
-	if self.Owner:KeyDown(IN_SPEED) and self.Owner:OnGround() and DTInt3 != 6 and DTInt3 != 10 and DTInt3 != 15 then
-		if self.Owner:GetVelocity():Length() > self.Owner:GetWalkSpeed() then
-			if DTInt3 != 2 and DTInt3 != 15 then
-				self:SetDTInt(3, 2)
-				if SERVER then
-					self.Owner:SetFOV(0, 0.3)
-					self.Owner:DrawViewModel(true)
-					self:SetNextPrimaryFire(CurTime() + 0.3)
-					self:SetNextSecondaryFire(CurTime() + 0.3)
+	if DTInt3 != 20 then
+		if self.Owner:KeyDown(IN_SPEED) and self.Owner:OnGround() and DTInt3 != 6 and DTInt3 != 10 and DTInt3 != 15 then
+			if self.Owner:GetVelocity():Length() > self.Owner:GetWalkSpeed() then
+				if DTInt3 != 2 and DTInt3 != 15 then
+					self:SetDTInt(3, 2)
+					if SERVER then
+						self.Owner:SetFOV(0, 0.3)
+						self.Owner:DrawViewModel(true)
+						self:SetNextPrimaryFire(CurTime() + 0.3)
+						self:SetNextSecondaryFire(CurTime() + 0.3)
+					end
 				end
-			end
 
-		else
-			if self:GetDTInt(3) != 1 or DTInt3 != 8 and DTInt3 != 10 and DTInt3 != 11 and DTInt3 != 12 and DTInt3 != 15 then
-				self:SetDTInt(3, 0)
-				if SERVER then
-					self.Owner:SetFOV(0, 0.3)
-					self.Owner:DrawViewModel(true)
+			else
+				if DTInt3 != 1 or DTInt3 != 8 and DTInt3 != 10 and DTInt3 != 11 and DTInt3 != 12 and DTInt3 != 15 then
+					self:SetDTInt(3, 0)
+					if SERVER then
+						self.Owner:SetFOV(0, 0.3)
+						self.Owner:DrawViewModel(true)
+					end
 				end
 			end
-		end
-	elseif not self.Owner:KeyDown(IN_SPEED) and DTInt3 != 1 and DTInt3 != 0 and DTInt3 != 6 and DTInt3 != 8 and DTInt3 != 10 and DTInt3 != 11 and DTInt3 != 12 and DTInt3 != 15 or not self.Owner:OnGround() and DTInt3 != 6 and DTInt3 != 0 and DTInt3 != 15 then
-		self:SetDTInt(3, 0)
-		if SERVER then
-			self.Owner:SetFOV(0, 0.2)
-			self.Owner:DrawViewModel(true)
-			self:SetNextPrimaryFire(CurTime() + 0.3)
-			self:SetNextSecondaryFire(CurTime() + 0.3)
+		elseif not self.Owner:KeyDown(IN_SPEED) and DTInt3 != 1 and DTInt3 != 0 and DTInt3 != 6 and DTInt3 != 8 and DTInt3 != 10 and DTInt3 != 11 and DTInt3 != 12 and DTInt3 != 15 or not self.Owner:OnGround() and DTInt3 != 6 and DTInt3 != 0 and DTInt3 != 15 then
+			self:SetDTInt(3, 0)
+			if SERVER then
+				self.Owner:SetFOV(0, 0.2)
+				self.Owner:DrawViewModel(true)
+				self:SetNextPrimaryFire(CurTime() + 0.3)
+				self:SetNextSecondaryFire(CurTime() + 0.3)
+			end
 		end
 	end
 
@@ -145,6 +147,12 @@ function SWEP:Think()
 			local wep = ply:GetActiveWeapon()
 			local activity = wep:GetSequenceActivityName(wep:GetSequence())
 			local seqdur = vm:SequenceDuration()
+
+			local FT = FrameTime()
+
+			if not wep.IsCustomWeapon then
+				return
+			end
 
 			if IsValid(wep) then
 				if wep.MagBone then
@@ -194,16 +202,33 @@ function SWEP:Think()
 				end
 
 				if wep:GetDTInt(3) == 15 then
-					wep.TargetOffset = wep.MeleeOffset
+					if wep.MeleeOffset then
+						wep.TargetOffset = wep.MeleeOffset
+					else
+						if wep.VElements["vertgrip"] and wep.VElements["vertgrip"].color.a == 255 then
+							wep.TargetOffset = wep.VertGrip_Idle
+						elseif wep.VElements["cmag"] and wep.VElements["cmag"].color.a == 255 then
+							wep.TargetOffset = wep.CMag_Idle
+						end
+					end
 				else
 					if wep.VElements and (wep.VElements["grenadelauncher"] or wep.VElements["vertgrip"] or wep.VElements["cmag"]) then
 
 						if wep.VElements["grenadelauncher"] and wep.VElements["grenadelauncher"].color.a == 255 then
 
-							if wep:GetDTInt(3) == 8 then
-								wep.TargetOffset = wep.GrenadeLauncher_Active
+							if activity == "ACT_VM_RELOAD" or activity == "ACT_VM_RELOAD_SILENCED" or activity == "ACT_VM_DETACH_SILENCER" or activity == "ACT_VM_ATTACH_SILENCER" then
+
+								if wep.OffsetMeStage == 1 then
+									wep.TargetOffset = "none"
+								elseif wep.OffsetMeStage == 2 then
+									wep.TargetOffset = wep.GrenadeLauncher_Idle
+								end
 							else
-								wep.TargetOffset = wep.GrenadeLauncher_Idle
+								if wep:GetDTInt(3) == 8 then
+									wep.TargetOffset = wep.GrenadeLauncher_Active
+								else
+									wep.TargetOffset = wep.GrenadeLauncher_Idle
+								end
 							end
 
 						elseif wep.VElements["vertgrip"] and wep.VElements["vertgrip"].color.a == 255 then
@@ -262,11 +287,11 @@ function SWEP:Think()
 						wep.OffsetBones[k] = wep.OffsetBones[k] or {}
 
 						if v.curoffset then
-							v.curoffset = LerpVector(wep.BoneApproachSpeed or 0.3, v.curoffset, Vector(0, 0, 0))
+							v.curoffset = LerpVector(FT * 27, v.curoffset, Vector(0, 0, 0))
 						end
 
 						if v.currotation then
-							v.currotation = LerpVector(wep.BoneApproachSpeed or 0.3, v.currotation, Vector(0, 0, 0))
+							v.currotation = LerpVector(FT * 27, v.currotation, Vector(0, 0, 0))
 						end
 
 						local bone = vm:LookupBone(k)
@@ -298,11 +323,11 @@ function SWEP:Think()
 							end
 
 							if wep.OffsetMeStage == 1 then
-								wep.OffsetBones[k].curoffset = LerpVector(wep.BoneApproachSpeed or 0.3, wep.OffsetBones[k].curoffset, v.vector or Vector(0, 0, 0))
-								wep.OffsetBones[k].currotation = LerpVector(wep.BoneApproachSpeed or 0.3, wep.OffsetBones[k].currotation, v.angle or Vector(0, 0, 0))
+								wep.OffsetBones[k].curoffset = LerpVector(FT * 27, wep.OffsetBones[k].curoffset, v.vector or Vector(0, 0, 0))
+								wep.OffsetBones[k].currotation = LerpVector(FT * 27, wep.OffsetBones[k].currotation, v.angle or Vector(0, 0, 0))
 							elseif wep.OffsetMeStage == 2 then
-								wep.OffsetBones[k].curoffset = LerpVector(wep.BoneApproachSpeed or 0.3, wep.OffsetBones[k].curoffset, v.vector)
-								wep.OffsetBones[k].currotation = LerpVector(wep.BoneApproachSpeed or 0.3, wep.OffsetBones[k].currotation, v.angle)
+								wep.OffsetBones[k].curoffset = LerpVector(FT * 27, wep.OffsetBones[k].curoffset, v.vector)
+								wep.OffsetBones[k].currotation = LerpVector(FT * 27, wep.OffsetBones[k].currotation, v.angle)
 							end
 
 							local bone = vm:LookupBone(k)
@@ -318,70 +343,42 @@ function SWEP:Think()
 					end
 				end
 
-					if activity == "ACT_VM_RELOAD" or activity == "ACT_VM_RELOAD_SILENCED" or activity == "ACT_VM_ATTACH_SILENCER" or activity == "ACT_VM_DETACH_SILENCER" then
-						if not wep.TimerCreated then
+				if activity == "ACT_VM_RELOAD" or activity == "ACT_VM_RELOAD_SILENCED" or activity == "ACT_VM_ATTACH_SILENCER" or activity == "ACT_VM_DETACH_SILENCER" then
+					if not wep.TimerCreated then
 
-							wep.OffsetMeStage = 1
+						wep.OffsetMeStage = 1
 
-							local TimeRel, TimeIdle
+						local TimeRel, TimeIdle
 
-							if wep:Clip1() > 0 and (activity == "ACT_VM_RELOAD" or activity == "ACT_VM_RELOAD_SILENCED") then
-								TimeRel = (seqdur * (1 - wep.IncAmmoPerc)) / wep.ReloadSpeed
-								TimeIdle = (seqdur * (1 - wep.IncAmmoPerc)) / wep.ReloadSpeed
-							else
-								TimeRel = (seqdur / wep.ReloadSpeed) - 0.5
-								TimeIdle = (seqdur / wep.ReloadSpeed) - 0.01
-							end
-
-							timer.Simple(TimeRel, function()
-								wep.OffsetMeStage = 2
-							end)
-
-							timer.Simple(TimeIdle, function()
-								//if wep.Silenced == 1 then
-								//	wep:SendWeaponAnim(ACT_VM_IDLE_SILENCED)
-								//else
-									wep:SendWeaponAnim(ACT_VM_IDLE)
-								//end
-							end)
-
-							wep.TimerCreated = true
+						if wep:Clip1() > 0 and (activity == "ACT_VM_RELOAD" or activity == "ACT_VM_RELOAD_SILENCED") then
+							TimeRel = (seqdur * (1 - wep.IncAmmoPerc)) / wep.ReloadSpeed
+							TimeIdle = (seqdur * (1 - wep.IncAmmoPerc)) / wep.ReloadSpeed
+						else
+							TimeRel = (seqdur / wep.ReloadSpeed) - 0.5
+							TimeIdle = (seqdur / wep.ReloadSpeed) - 0.01
 						end
-					else
-						wep.TimerCreated = false
-						wep.OffsetMeStage = 2
+
+						timer.Simple(TimeRel, function()
+							wep.OffsetMeStage = 2
+						end)
+
+						timer.Simple(TimeIdle, function()
+							//if wep.Silenced == 1 then
+							//	wep:SendWeaponAnim(ACT_VM_IDLE_SILENCED)
+							//else
+								wep:SendWeaponAnim(ACT_VM_IDLE)
+							//end
+						end)
+
+						wep.TimerCreated = true
 					end
+				else
+					wep.TimerCreated = false
+					wep.OffsetMeStage = 2
+				end
 				//end
 			end
 		end
-
-		//if self.Owner:SteamID() == "STEAM_0:1:24752442" then
-			/*if not self.Owner.HookCreated then
-				hook.Add("RenderScreenspaceEffects", "Hey bro, eat my dick", function()
-					local ply = LocalPlayer()
-
-					if ply.TimeToFaceMap == nil then
-						ply.TimeToFaceMap = 0
-					end
-
-					if CurTime() < ply.TimeToFaceMap then
-						DrawMaterialOverlay("models/gman/gman_facehirez.vmt", 0)
-					end
-
-					if CurTime() > ply.TimeToFaceMap then
-
-						for i = 1, 5 do
-							ply:EmitSound("npc/stalker/go_alert2a.wav", 150, 100)
-						end
-
-						ply.TimeToFaceMap = CurTime() + 0.1
-					end
-				end)
-
-				self.Owner.HookCreated = true
-			end*/
-		//end
-
 	end
 end
 
@@ -565,6 +562,27 @@ if CLIENT then
 			RunConsoleCommand("zoom_out")
 			return true
 		end
+	end
+end
+
+function SWEP:HolsterWeapon(ply)
+	local dt3 = self:GetDTInt(3)
+
+	if dt3 == 20 then
+		self:SetDTInt(3, 0)
+
+		local CT = CurTime()
+
+		self:SetNextPrimaryFire(CT + 0.4)
+		self:SetNextSecondaryFire(CT + 0.4)
+		self.ReloadDelay = CT + 0.4
+		self.MeleeDelay = CT + 0.4
+	else
+		if dt3 != 0 then
+			ply:SetFOV(0, 0.3)
+		end
+
+		self:SetDTInt(3, 20)
 	end
 end
 

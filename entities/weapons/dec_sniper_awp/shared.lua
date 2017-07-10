@@ -10,7 +10,7 @@ if ( SERVER ) then
 	SWEP.ScopeStatus = 5
 	SWEP.MeleeDamageMin = 20
 	SWEP.MeleeDamageMax = 25
-	
+
 	SWEP.BulletLength = 8.58
 	SWEP.CaseLength = 69.20
 	SWEP.NoLaser = true
@@ -18,7 +18,7 @@ end
 
 if ( CLIENT ) then
 
-	SWEP.PrintName			= "AWP"			
+	SWEP.PrintName			= "AWP"
 	SWEP.Author				= "Counter-Strike"
 	SWEP.Slot				= 4
 	SWEP.SlotPos			= 1
@@ -27,17 +27,18 @@ if ( CLIENT ) then
 	SWEP.SparkEffect = "cstm_child_sparks_large"
 	SWEP.SmokeEffect = "cstm_child_smoke_large"
 	SWEP.BoneApproachSpeed = 0.8
-	
+	SWEP.BackModel = "models/weapons/w_snip_awp.mdl"
+
 	killicon.AddFont( "cstm_sniper_awp", "CSKillIcons", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
-	
+
 	SWEP.VElements = {
 		["silencer"] = { type = "Model", model = "models/props_c17/oildrum001.mdl", bone = "v_weapon.awm_parent", pos = Vector(-0.232, 3.381, 20), angle = Angle(1.031, 3.094, 0), size = Vector(0.059, 0.059, 0.25), color = Color(255, 255, 255, 1), surpresslightning = false, material = "models/bunneh/silencer", skin = 0, bodygroup = {} }
 	}
-	
+
 	SWEP.WElements = {
 		["silencer"] = { type = "Model", model = "models/props_c17/oildrum001.mdl", pos = Vector(40, 1.506, -2.863), angle = Angle(-90, 0, 0), size = Vector(0.059, 0.059, 0.25), color = Color(255, 255, 255, 1), surpresslightning = false, material = "models/bunneh/silencer", skin = 0, bodygroup = {} }
 	}
-	
+
 	SWEP.MeleeOffset = {
 		['v_weapon.Left_Arm'] = {vector = Vector(16.493999481201, -3.0250000953674, 10.031000137329), angle = Vector(131.30000305176, -30.313999176025, 27.055999755859)},
 		['v_weapon.Left_Middle01'] = {vector = Vector(0, 0, 0), angle = Vector(0, -44.681999206543, 0)},
@@ -48,8 +49,9 @@ if ( CLIENT ) then
 		['v_weapon.Left_Pinky01'] = {vector = Vector(0, 0, 0), angle = Vector(0, -36.737998962402, 0)},
 		['v_weapon.Left_Pinky02'] = {vector = Vector(0, 0, 0), angle = Vector(-24.663000106812, -36.362998962402, 0)},
 		['v_weapon.Left_Pinky03'] = {vector = Vector(0, 0, 0), angle = Vector(0, -71.763000488281, 0)} }
-		
-	
+
+		SWEP.ReloadAct = "reload"
+
 end
 
 SWEP.Caliber = ".338 Lapua Magnum"

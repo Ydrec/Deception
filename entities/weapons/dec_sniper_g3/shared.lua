@@ -9,7 +9,7 @@ if ( SERVER ) then
 	SWEP.NoEOTech = true
 	SWEP.NoDocter = true
 	SWEP.ScopeStatus = 5
-	
+
 	SWEP.BulletLength = 7.62
 	SWEP.CaseLength = 51
 	SWEP.NoLaser = true
@@ -17,7 +17,7 @@ end
 
 if ( CLIENT ) then
 
-	SWEP.PrintName			= "G3SG1"			
+	SWEP.PrintName			= "G3SG1"
 	SWEP.Author				= "Counter-Strike"
 	SWEP.Slot				= 4
 	SWEP.SlotPos			= 1
@@ -25,17 +25,20 @@ if ( CLIENT ) then
 	SWEP.Muzzle = "cstm_muzzle_br"
 	SWEP.SparkEffect = "cstm_child_sparks_large"
 	SWEP.SmokeEffect = "cstm_child_smoke_large"
-	
+	SWEP.BackModel = "models/weapons/w_snip_g3sg1.mdl"
+
 	killicon.AddFont( "cstm_sniper_g3", "CSKillIcons", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
-	
+
 	SWEP.VElements = {
 		["silencer"] = { type = "Model", model = "models/props_c17/oildrum001.mdl", bone = "v_weapon.g3sg1_Parent", pos = Vector(0, 3.743, 19.861), angle = Angle(0, 0, 0), size = Vector(0.05, 0.05, 0.17), color = Color(255, 255, 255, 1), surpresslightning = false, material = "models/bunneh/silencer", skin = 0, bodygroup = {} }
 	}
-	
+
 	SWEP.WElements = {
 		["silencer"] = { type = "Model", model = "models/props_c17/oildrum001.mdl", pos = Vector(29.613, 0.244, -4.331), angle = Angle(-90, 0, 0), size = Vector(0.05, 0.05, 0.17), color = Color(255, 255, 255, 1), surpresslightning = false, material = "models/bunneh/silencer", skin = 0, bodygroup = {} }
 	}
-	
+
+	SWEP.NoRail = true
+
 end
 
 SWEP.Caliber = "7.62x51MM"
@@ -71,6 +74,7 @@ SWEP.Primary.Automatic		= true
 SWEP.Primary.Ammo			= "SniperPenetratedRound"
 SWEP.InitialHoldtype = "smg"
 SWEP.InHoldtype = "smg"
+SWEP.ReloadAct = "reload"
 
 -- Animation speed/custom reload function related
 SWEP.IsReloading = false
