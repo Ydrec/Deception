@@ -51,7 +51,7 @@ if ( CLIENT ) then
 		AngRight = 0,
 		AngForward = 0 }
 
-	// This is the font that's used to draw the death icons
+	// This is the font thats used to draw the death icons
 	surface.CreateFont( "CSKillIcons", {size=ScreenScale( 30 ), weight=500, antialias=true, additive =true, font="csd"} )
 	surface.CreateFont( "CSSelectIcons", {size=ScreenScale( 60 ), weight=500, antialias=true, additive =true, font="csd"} )
 end
