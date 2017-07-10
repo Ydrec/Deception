@@ -180,7 +180,6 @@ function GM:Initialize()
 end
 
 CurMap = string.lower(game.GetMap())
-
 function GM:CreateEnts()
 	for k, v in pairs(MapEnts) do
 		if v.map == CurMap then
@@ -321,15 +320,15 @@ function GM:PlayerDisconnected(ply)
 			SendUserMessage("DISC_VIP")
 		end
 
-		if not AgentA and not AgentB and VIP then
-			self:EndRound(1)
-		end
-
-		if AgentA and not AgentB and not VIP then
-			self:EndRound(2, AgentA)
-		elseif AgentB and not AgentA and not VIP then
-			self:EndRound(2, AgentB)
-		end
+		-- if not AgentA and not AgentB and VIP then
+		-- 	self:EndRound(1)
+		-- end
+		--
+		-- if AgentA and not AgentB and not VIP then
+		-- 	self:EndRound(2, AgentA)
+		-- elseif AgentB and not AgentA and not VIP then
+		-- 	self:EndRound(2, AgentB)
+		-- end
 	end
 
 	if ply.Ragdoll then
@@ -675,8 +674,32 @@ function GM:Think()
 			end
 		end
 	end
+
+
+	-- Round check. This will probably fix most of the round end issues.
+	if (GameStarted and CanBuy) then
+		if IsValid(VIP) and VIP:Alive() then
+			if (not IsValid(AgentA) or not AgentA:Alive()) and (not IsValid(AgentB) or not AgentB:Alive()) then
+				self:EndRound(1)
+			end
+		else
+			local AgentAValid = IsValid(AgentA) and AgentA:Alive()
+			local AgentBValid = IsValid(AgentB) and AgentB:Alive()
+			if AgentAValid != AgentBValid then
+				self:EndRound(2, AgentAValid and AgentA or AgentB)
+			end
+		end
+	end
 end
 
+-- Variables for optimization
+local DamageScaleByHitgroup = {
+	[HITGROUP_LEFTARM] = {0.5},
+	[HITGROUP_RIGHTARM] = {0.5},
+	[HITGROUP_HEAD] = {3, 2},
+	[HITGROUP_LEFTLEG] = {0.75, 1.25},
+	[HITGROUP_RIGHTLEG] = {0.75, 1.25}
+}
 function GM:ScalePlayerDamage(ply, hg, dmginfo)
 	dmginfo:ScaleDamage(0.5) -- halven the damage
 
@@ -701,14 +724,12 @@ function GM:ScalePlayerDamage(ply, hg, dmginfo)
 
 	dmgmod = 0.5
 
-	if hg == HITGROUP_LEFTARM or hg == HITGROUP_RIGHTARM then
-		dmginfo:ScaleDamage(0.5)
-	elseif hg == HITGROUP_HEAD then
-		dmginfo:ScaleDamage(3)
-		dmgmod = 2
-	elseif hg == HITGROUP_LEFTLEG or hg == HITGROUP_RIGHTLEG then
-		dmginfo:ScaleDamage(0.75)
-		dmgmod = 1.25
+	local HitgroupDamageInfo = DamageScaleByHitgroup[hg]
+	if (HitgroupDamageInfo) then
+		dmginfo:ScaleDamage(HitgroupDamageInfo[1])
+		if (HitgroupDamageInfo[2]) then
+			dmgmod = HitgroupDamageInfo[2]
+		end
 	end
 
 	ply:SetDTInt(2, math.Clamp(ply:GetDTInt(2) - dmg * dmgmod, 0, 100))
@@ -967,47 +988,27 @@ function GM:DoPlayerDeath(ply, attacker, dmginfo)
 					end
 				end
 			end
-
-			if ply.IsVIP then
-				VIP = nil
-			elseif ply == AgentA then
-				AgentA = nil
-			elseif ply == AgentB then
-				AgentB = nil
-			end
-
-			if IsValid(VIP) then
-				if not IsValid(AgentA) and not IsValid(AgentB) then
-					self:EndRound(1)
-				end
-			else
-				if IsValid(AgentA) and not IsValid(AgentB) then
-					self:EndRound(2, AgentA)
-				elseif IsValid(AgentB) and not IsValid(AgentA) then
-					self:EndRound(2, AgentB)
-				end
-			end
-		else
-			if ply.IsVIP then
-				VIP = nil
-			elseif ply == AgentA then
-				AgentA = nil
-			elseif ply == AgentB then
-				AgentB = nil
-			end
-
-			if VIP then
-				if not AgentA and not AgentB then
-					self:EndRound(1)
-				end
-			else
-				if AgentA and not AgentB then
-					self:EndRound(2, AgentA)
-				elseif AgentB and not AgentA then
-					self:EndRound(2, AgentB)
-				end
-			end
 		end
+
+		if ply.IsVIP then
+			VIP = nil
+		elseif ply == AgentA then
+			AgentA = nil
+		elseif ply == AgentB then
+			AgentB = nil
+		end
+
+		-- if IsValid(VIP) then
+		-- 	if not IsValid(AgentA) and not IsValid(AgentB) then
+		-- 		self:EndRound(1)
+		-- 	end
+		-- else
+		-- 	if IsValid(AgentA) and not IsValid(AgentB) then
+		-- 		self:EndRound(2, AgentA)
+		-- 	elseif IsValid(AgentB) and not IsValid(AgentA) then
+		-- 		self:EndRound(2, AgentB)
+		-- 	end
+		-- end
 	end
 
 	ply.ExamTarget = nil
@@ -1268,7 +1269,7 @@ function GM:AttemptSelection()
 		RT = GetConVarNumber("dec_roundtime")
 
 		timetosend = (GameStartTime - CurTime()) + RT
-		print(timetosend)
+		-- print(timetosend)
 
 		umsg.Start("ROUNDTIME")
 			umsg.Long(timetosend)
@@ -1286,9 +1287,42 @@ function GM:AttemptSelection()
 			end
 		end
 
-		rand = math.random(1, #ply)
-		AgentA = ply[rand]
-		table.remove(ply, rand)
+		local plyNoBots = {}
+		local plyBots = {}
+		for k, v in pairs(ply) do
+			if v:IsBot() then
+				table.insert(plyBots, v)
+			else
+				table.insert(plyNoBots, v)
+			end
+		end
+
+		local ChosenPlys = {}
+		for k, v in RandomPairs(plyNoBots) do
+			if #ChosenPlys >= 3 then
+				break
+			end
+
+			table.insert(ChosenPlys, v)
+			table.RemoveByValue(ply, v)
+			print("Prioritized " .. v:Name())
+		end
+
+		if (#ChosenPlys < 3) then
+			for k, v in RandomPairs(plyBots) do
+				if #ChosenPlys >= 3 then
+					break
+				end
+
+				table.insert(ChosenPlys, v)
+				table.remove(ply, k)
+			end
+		end
+
+
+		rand = math.random(#ChosenPlys)
+		AgentA = ChosenPlys[rand]
+		table.remove(ChosenPlys, rand)
 		AgentA:SetDTInt(0, GetConVarNumber("dec_startmoney_agent") * (AgentA:GetDTInt(1) / 100))
 		AgentA.Income = GetConVarNumber("dec_income_agent_amount")
 		AgentA.IncomeTime = GetConVarNumber("dec_income_agent_time")
@@ -1296,9 +1330,9 @@ function GM:AttemptSelection()
 		AgentA.DetectionAmount = 5
 		AgentA.AgencyHelp = 3
 
-		rand = math.random(1, #ply)
-		AgentB = ply[rand]
-		table.remove(ply, rand)
+		rand = math.random(#ChosenPlys)
+		AgentB = ChosenPlys[rand]
+		table.remove(ChosenPlys, rand)
 		AgentB:SetDTInt(0, GetConVarNumber("dec_startmoney_agent") * (AgentB:GetDTInt(1) / 100))
 		AgentB.Income = GetConVarNumber("dec_income_agent_amount")
 		AgentB.IncomeTime = GetConVarNumber("dec_income_agent_time")
@@ -1306,9 +1340,9 @@ function GM:AttemptSelection()
 		AgentB.DetectionAmount = 5
 		AgentB.AgencyHelp = 3
 
-		rand = math.random(1, #ply)
-		VIP = ply[rand]
-		table.remove(ply, rand)
+		rand = math.random(#ChosenPlys)
+		VIP = ChosenPlys[rand]
+		table.remove(ChosenPlys, rand)
 		VIP:SetDTInt(0, GetConVarNumber("dec_startmoney_vip") * (VIP:GetDTInt(1) / 100))
 		VIP.Income = GetConVarNumber("dec_income_vip_amount")
 		VIP.IncomeTime = GetConVarNumber("dec_income_vip_time")
@@ -2353,7 +2387,7 @@ end
 concommand.Add("dec_useitem", DEC_UseItem)
 
 local function DEC_RestartRound(ply)
-	if ply:IsAdmin() or ply:IsSuperAdmin() then
+	if not IsValid(ply) or (ply:IsAdmin() or ply:IsSuperAdmin()) then
 		RoundsPlayed = math.Clamp(RoundsPlayed - 1, 0, GetConVarNumber("dec_rounds"))
 		GAMEMODE:EndRound(4)
 	end
