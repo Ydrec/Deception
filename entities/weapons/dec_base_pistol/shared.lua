@@ -338,7 +338,7 @@ function SWEP:StartCustomReload(anim, animspeed)
 	local time = (seqdur / self.ReloadSpeed) - ((seqdur / self.ReloadSpeed) * self.IncAmmoPerc)
 
 	timer.Create("StartCustomReloadTimer" .. self.Owner:Nick(), time, 1, function()
-		if not IsValid(self) or self:GetClass() != self.Owner:GetActiveWeapon():GetClass() then
+		if not IsValid(self) or (IsValid(self) and IsValid(self.Owner) and self:GetClass() != self.Owner:GetActiveWeapon():GetClass()) then
 			return
 		end
 
