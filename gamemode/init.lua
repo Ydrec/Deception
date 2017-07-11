@@ -689,6 +689,17 @@ function GM:Think()
 				self:EndRound(2, AgentAValid and AgentA or AgentB)
 			end
 		end
+
+		local plysAlive = 0
+		for k, v in pairs(player.GetAll()) do
+			if v:Alive() then
+				plysAlive = plysAlive + 1
+			end
+		end
+
+		if plysAlive == 0 then
+			self:EndRound(1)
+		end
 	end
 end
 
@@ -1257,7 +1268,14 @@ function GM:AttemptSelection()
 
 		for k, v in pairs(ply) do
 			if not v:Alive() then
-				ply[k] = nil
+				-- ply[k] = nil
+				-- Lets respawn them instead, this is a bit useless
+				v:Spawn()
+
+				if IsValid(v.Ragdoll) then
+					SafeRemoveEntity(v.Ragdoll)
+					v.Ragdoll = nil
+				end
 			end
 		end
 
@@ -1317,6 +1335,12 @@ function GM:AttemptSelection()
 				table.insert(ChosenPlys, v)
 				table.remove(ply, k)
 			end
+		end
+
+		if (#ChosenPlys < 3) then
+			self:EndRound(1)
+			print("Error. Not enough humans alive")
+			return
 		end
 
 
