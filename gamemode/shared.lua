@@ -1,4 +1,4 @@
-Ver = "1.0.7.1"
+Ver = "1.0.7.3"
 
 GM.Name 		= "Deception " .. Ver
 GM.Author 		= "Spy"
