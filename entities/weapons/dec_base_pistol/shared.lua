@@ -201,7 +201,7 @@ end
 
 function SWEP:Deploy()
 	local time = CurTime()
-
+	self.Owner:GetViewModel():SetModel(self.ViewModel)
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self:SetNextPrimaryFire(time + 1)
 	self:SetNextSecondaryFire(time + 1)
