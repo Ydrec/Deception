@@ -318,6 +318,10 @@ local Calibers = {
 	["5.56x45MM"] = {cal = "5.56x45MM firearm", func = function(text)
 		return "It looks like this person was killed by\na firearm chambered in the\n" .. text .. " caliber."
 	end},
+	
+	["7.62×51MM"] = {cal = "7.62×51MM firearm", func = function(text)
+		return "It looks like this person was killed by\na firearm chambered in the\n" .. text .. " caliber."
+	end},
 
 	[".338 Lapua Magnum"] = {cal = ".338 Lapua Magnum firearm", func = function(text)
 		return "It looks like this person was killed by\na firearm chambered in the\n" .. text .. " caliber."
