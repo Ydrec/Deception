@@ -458,6 +458,7 @@ Weapons["models/weapons/w_rif_galil.mdl"] = {name = "IMI Galil AR", class = "dec
 Weapons["models/weapons/w_snip_awp.mdl"] = {name = "AWP", class = "dec_sniper_awp", unload = true}
 Weapons["models/weapons/w_snip_g3sg1.mdl"] = {name = "G3SG1", class = "dec_sniper_g3sg1", unload = true}
 Weapons["models/weapons/w_snip_sg550.mdl"] = {name = "SG550", class = "dec_sniper_g3sg1", unload = true}
+Weapons["models/weapons/w_snip_scout.mdl"] = {name = "Scout", class = "dec_sniper_scout", unload = true}
 Weapons["models/weapons/w_pistol.mdl"] = {name = "Dart gun", class = "dec_dart_gun", unload = true}
 Weapons["models/weapons/w_c4.mdl"] = {name = "Ballistics Analyzer", class = "dec_balanal", unload = false}
 
