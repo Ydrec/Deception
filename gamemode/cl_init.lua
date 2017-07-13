@@ -341,9 +341,11 @@ function GM:OnPlayerChat(ply, text, tm, dead)
 		clr1 = Color(255, 0, 0)
 	else
 		if ply == pl or pl:IsAdmin() or pl:IsSuperAdmin() then
-			txt2 = ply:Nick()
+			txt2 = IsValid(ply) and ply:Nick() or "Console"
 		else
-			if ply.Status and ply.Status != 0 then
+			if not IsValid(ply) then
+				txt2 = "Console"
+			elseif ply.Status and ply.Status != 0 then
 				txt2 = ply:Nick()
 			end
 		end
@@ -878,7 +880,7 @@ function GM:HUDPaint()
 		stext("Ghost powers: " .. gp .. "%", "UiBold", X * 0.5, 137, Color(255, 255, 255, 255), Color(0, 0, 0, 255), 1, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 
-	if StatusText then
+	if StatusText and StatusText.Type then
 		if CT < StatusAlphaTime then
 			StatusAlpha = app(StatusAlpha, 255, FT * 400)
 		else
