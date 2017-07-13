@@ -124,6 +124,9 @@ umsg.PoolString("ROUNDRESTART")
 umsg.PoolString("MEDKITGET")
 umsg.PoolString("GETCARRY")
 
+// Net
+util.AddNetworkString("MAPSTOVOTEFOR_NET")
+
 CreateConVar("dec_roundtime", "600", (FCVAR_ARCHIVE || FCVAR_REPLICATED || FCVAR_NOTIFY))
 CreateConVar("dec_runspeed", "310", (FCVAR_ARCHIVE || FCVAR_REPLICATED || FCVAR_NOTIFY))
 CreateConVar("dec_startmoney_civilian", "200", (FCVAR_ARCHIVE || FCVAR_REPLICATED || FCVAR_NOTIFY))
@@ -367,6 +370,10 @@ end
 
 function GM:PlayerCanSeePlayersChat(text, tm, listener, talker)
 	if not CanBuy then
+		return true
+	end
+
+	if !IsValid(talker) then
 		return true
 	end
 
@@ -677,7 +684,7 @@ function GM:Think()
 
 
 	-- Round check. This will probably fix most of the round end issues.
-	if (GameStarted and CanBuy) then
+	if (GameStarted and CanBuy) and not VoteStarted then
 		if IsValid(VIP) and VIP:Alive() then
 			if (not IsValid(AgentA) or not AgentA:Alive()) and (not IsValid(AgentB) or not AgentB:Alive()) then
 				self:EndRound(1)
@@ -1353,6 +1360,7 @@ function GM:AttemptSelection()
 		AgentA.InexperienceRatio = 1
 		AgentA.DetectionAmount = 5
 		AgentA.AgencyHelp = 3
+		-- Maximum ammount of helps you can get from the agency
 
 		rand = math.random(#ChosenPlys)
 		AgentB = ChosenPlys[rand]
@@ -1363,6 +1371,7 @@ function GM:AttemptSelection()
 		AgentB.InexperienceRatio = 1
 		AgentB.DetectionAmount = 5
 		AgentB.AgencyHelp = 3
+		-- Maximum ammount of helps you can get from the agency
 
 		rand = math.random(#ChosenPlys)
 		VIP = ChosenPlys[rand]
