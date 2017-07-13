@@ -275,6 +275,7 @@ function GM:PlayerSpawn(ply)
 		ply.DamageSpeedMod = 1
 		ply.DamageDone = 0
 		ply.HintsBought = 0
+		ply.NonVIPPlayers = nil
 		ply.FingerPrint = math.random(1, 50000)
 		ply:PositionMe()
 
