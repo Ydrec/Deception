@@ -91,6 +91,7 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
+	self.Owner:GetViewModel():SetModel(self.ViewModel)
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self:SetNextPrimaryFire(CurTime() + 1)
 	self:SetNextSecondaryFire(CurTime() + 1)

@@ -69,6 +69,7 @@ end
 
 function SWEP:Deploy()
 	CT = CurTime()
+	self.Owner:GetViewModel():SetModel(self.ViewModel)
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self.ReloadDelay = CT + 0.8
 	self:SetNextPrimaryFire(CT + 0.8)
