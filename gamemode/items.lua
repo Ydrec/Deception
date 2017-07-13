@@ -296,6 +296,92 @@ end
 GM:RegisterItem(NI)
 
 NI = {}
+NI.num = 12
+NI.Name = "Scout"
+NI.Category = "Weapons"
+NI.Description = "A civilian grade sniper rifle\nUsed for long range defense."
+NI.Stats = {damage = 50, accuracy = 100, rof = 48, range = 100}
+NI.Model = "models/weapons/w_snip_sg550.mdl"
+NI.Price = 450
+NI.Unique = false
+NI.CanBuy = function(ply)
+	if not ply:HasWeapon("dec_sniper_scout") then
+		return 1
+	end
+
+	return 2
+end
+
+NI.BuyFunc = function(ply)
+	local wep = ply:Give("dec_sniper_scout")
+	ply:GiveAmmoCap(10, "AirboatGun")
+end
+
+GM:RegisterItem(NI)
+
+NI = {}
+NI.num = 13
+NI.Name = "AWP"
+NI.Category = "Weapons"
+NI.Description = "A Sniper Rifle chambered with a .338 caliber.\nVery high damage and long range."
+NI.Model = "models/weapons/w_snip_awp.mdl"
+NI.Stats = {damage = 80, accuracy = 100, rof = 41, range = 100}
+NI.Price = 1000
+NI.Unique = true
+NI.TeamText = {"VIP"}
+NI.CanBuy = function(ply)
+	if not ply.IsAgent then
+		return 3
+	end
+
+	if not ply:HasWeapon("dec_sniper_awp") then
+		return 1
+	end
+
+	return 2
+end
+
+NI.BuyFunc = function(ply)
+	local wep = ply:Give("dec_sniper_awp")
+	wep:SetClip1(10)
+
+	ply:GiveAmmoCap(10, "smg1")
+end
+
+GM:RegisterItem(NI)
+
+
+
+NI = {}
+NI.num = 14
+NI.Name = "SG550"
+NI.Category = "Weapons"
+NI.Description = "A auto sniper that fires quickly but\nit does less damage than the civilian scout."
+NI.Stats = {damage = 40, accuracy = 100, rof = 70, range = 100}
+NI.Model = "models/weapons/w_snip_sg550.mdl"
+NI.Price = 650
+NI.Unique = true
+NI.TeamText = {"Agent"}
+NI.CanBuy = function(ply)
+	if not ply.IsAgent then
+		return 3
+	end
+
+	if not ply:HasWeapon("dec_sniper_sg550") then
+		return 1
+	end
+
+	return 2
+end
+
+NI.BuyFunc = function(ply)
+	local wep = ply:Give("dec_sniper_sg550")
+	ply:GiveAmmoCap(10, "AirboatGun")
+end
+
+GM:RegisterItem(NI)
+
+NI = {}
 NI.num = 201
 NI.Name = "Pistol ammo"
 NI.Category = "Ammo"
@@ -368,6 +454,30 @@ end
 
 NI.BuyFunc = function(ply)
 	ply:GiveAmmoCap(5, "SniperRound")
+end
+
+GM:RegisterItem(NI)
+
+NI = {}
+NI.num = 204
+NI.Name = "Sniper Ammo"
+NI.Category = "Ammo"
+NI.Description = "Ammo used for all Snipers.\nGives you 10 shots, maximum carryable\namount is 40 bullets."
+NI.Model = "models/Items/357ammobox.mdl"
+NI.Price = 75
+NI.CanBuy = function(ply)
+	local ac = ply:GetAmmoCount("AirboatGun")
+
+	if ac >= 40 then
+		SendUserMessage("AMMOFULL", ply)
+		return 3
+	end
+
+	return 1
+end
+
+NI.BuyFunc = function(ply)
+	ply:GiveAmmoCap(10, "AirboatGun")
 end
 
 GM:RegisterItem(NI)
