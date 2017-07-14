@@ -128,13 +128,14 @@ SWEP.SetAndForget			= false
 SWEP.IronSightsPos = Vector(6.0749, -5.5216, 2.3984)
 SWEP.IronSightsAng = Vector(2.5174, -0.0099, 0)
 
-SWEP.AimPos = Vector(5.4, -3.425, 2.086)
+SWEP.IronSightsPos = Vector(6.0749, -5.5216, 2.3984)
+SWEP.IronSightsAng = Vector(2.5174, -0.0099, 0)
+
+SWEP.AimPos = Vector(5, -9.056, 2.523)
 SWEP.AimAng = Vector(0, 0, 0)
 
 SWEP.ChargePos = Vector (5.4056, -10.3522, -4.0017)
 SWEP.ChargeAng = Vector (-1.7505, -55.5187, 68.8356)
 
-SWEP.MeleePos = Vector(-2.161, -17.542, 0.6)
-SWEP.MeleeAng = Vector(0, -130, 0)
 
 
