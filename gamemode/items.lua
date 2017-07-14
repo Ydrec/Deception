@@ -112,6 +112,30 @@ GM:RegisterItem(NI)
 
 NI = {}
 NI.num = 5
+NI.Name = "Scout"
+NI.Category = "Weapons"
+NI.Description = "A civilian grade sniper rifle\nUsed for long range defense."
+NI.Stats = {damage = 50, accuracy = 100, rof = 48, range = 100}
+NI.Model = "models/weapons/w_snip_scout.mdl"
+NI.Price = 450
+NI.Unique = false
+NI.CanBuy = function(ply)
+	if not ply:HasWeapon("dec_sniper_scout") then
+		return 1
+	end
+
+	return 2
+end
+
+NI.BuyFunc = function(ply)
+	local wep = ply:Give("dec_sniper_scout")
+	ply:GiveAmmoCap(10, "AirboatGun")
+end
+
+GM:RegisterItem(NI)
+
+NI = {}
+NI.num = 6
 NI.Name = "MAC-10"
 NI.Category = "Weapons"
 NI.Description = "A SMG chambered in the .45 ACP caliber.\nHigh damage at close range."
@@ -137,7 +161,7 @@ end
 GM:RegisterItem(NI)
 
 NI = {}
-NI.num = 6
+NI.num = 7
 NI.Name = "TMP"
 NI.Category = "Weapons"
 NI.Description = "A SMG chambered in the 9x19MM caliber.\nModerate damage at close range."
@@ -163,7 +187,7 @@ end
 GM:RegisterItem(NI)
 
 NI = {}
-NI.num = 7
+NI.num = 8
 NI.Name = "MP5"
 NI.Category = "Weapons"
 NI.Description = "A SMG chambered in the 9x19MM caliber.\nModerate damage at close range."
@@ -189,7 +213,7 @@ end
 GM:RegisterItem(NI)
 
 NI = {}
-NI.num = 8
+NI.num = 9
 NI.Name = "UMP"
 NI.Category = "Weapons"
 NI.Description = "A SMG chambered in the .45 ACP caliber.\nHigh damage at moderate range."
@@ -215,7 +239,7 @@ end
 GM:RegisterItem(NI)
 
 NI = {}
-NI.num = 9
+NI.num = 10
 NI.Name = "P90"
 NI.Category = "Weapons"
 NI.Description = "A SMG chambered in the 5.7x28MM caliber.\nVery high damage at long range."
@@ -241,7 +265,7 @@ end
 GM:RegisterItem(NI)
 
 NI = {}
-NI.num = 10
+NI.num = 11
 NI.Name = "Combat Knife"
 NI.Category = "Weapons"
 NI.Description = "A very durable, razor-sharp knife.\nCan kill a man in several stabs (or slashes).\nStabbing from behind results in a back-stab.\nBack-stabs kill the target instantly."
@@ -268,7 +292,7 @@ end
 GM:RegisterItem(NI)
 
 NI = {}
-NI.num = 11
+NI.num = 12
 NI.Name = "Dart gun"
 NI.Category = "Weapons"
 NI.Description = "A dart gun that fires out poison darts\nand makes little to no noise.\nThe poison can kill a man in 10 seconds.\nFired darts cannot be retrieved."
@@ -291,30 +315,6 @@ end
 NI.BuyFunc = function(ply)
 	local wep = ply:Give("dec_dart_gun")
 	ply:GiveAmmoCap(3, "SniperRound")
-end
-
-GM:RegisterItem(NI)
-
-NI = {}
-NI.num = 12
-NI.Name = "Scout"
-NI.Category = "Weapons"
-NI.Description = "A civilian grade sniper rifle\nUsed for long range defense."
-NI.Stats = {damage = 50, accuracy = 100, rof = 48, range = 100}
-NI.Model = "models/weapons/w_snip_sg550.mdl"
-NI.Price = 450
-NI.Unique = false
-NI.CanBuy = function(ply)
-	if not ply:HasWeapon("dec_sniper_scout") then
-		return 1
-	end
-
-	return 2
-end
-
-NI.BuyFunc = function(ply)
-	local wep = ply:Give("dec_sniper_scout")
-	ply:GiveAmmoCap(10, "AirboatGun")
 end
 
 GM:RegisterItem(NI)
