@@ -24,6 +24,7 @@ AmmoLimit = {}
 AmmoLimit["pistol"] = 96
 AmmoLimit["smg1"] = 120
 AmmoLimit["SniperRound"] = 5 -- poison darts
+AmmoLimit["AirboatGun"] = 40 -- Sniper Rounds
 
 for i = 1, 9 do
 	util.PrecacheModel("models/player/group01/male_0" .. i .. ".mdl")
