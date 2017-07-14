@@ -330,7 +330,7 @@ NI.Price = 1000
 NI.Unique = true
 NI.TeamText = {"VIP"}
 NI.CanBuy = function(ply)
-	if not ply.IsAgent then
+	if not ply.IsVIP then
 		return 3
 	end
 
