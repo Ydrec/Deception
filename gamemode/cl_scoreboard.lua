@@ -59,7 +59,7 @@ function GM:HUDDrawScoreBoard()
 	rect(X2 - 299, Y2 - 49 - scale1, 598, 98 + #ply * 30)
 	
 	rbox(6, X2 - 298, Y2 - 48 - scale1, 596, 30, Color(40, 40, 40, 125))
-	stext("'Deception' ver. " .. Ver .. " by Spy and trotskygrad (Ported by polivilas, Geferon, and Ndo360) ", "TabLarge", X2, Y2 - 34 - scale1, Color(255, 255, 255, 255), Color(0, 0, 0, 255), 1, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	stext("'Deception' ver. " .. Ver .. " by Spy and trotskygrad (Ported by polivilas, Geferon, Gmod4phun and Ndo360) ", "TabLarge", X2, Y2 - 34 - scale1, Color(255, 255, 255, 255), Color(0, 0, 0, 255), 1, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	
 	clr(137, 165, 126, 255)
 	orect(X2 - 275, Y2 - scale1, 550, 32 + #ply * 30)
