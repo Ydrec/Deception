@@ -563,31 +563,31 @@ Your stamina will also drain faster if you have lots of equipment
 	HelpPanel = create("DPanelList2", PSheet)
 	HelpPanel:SetSize(380, 320)
 
-	mblur = GetConVarNumber("mat_motion_blur_enabled")
+	mblur = GetConVar("mat_motion_blur_enabled")
 
 	CBox = create("DCheckBoxLabel", HelpPanel)
 	CBox:SetText("Motion Blur")
 	CBox:SetPos(0, 0)
-	CBox:SetConVar(mblur)
-	CBox:SetValue(mblur)
+	CBox:SetConVar(mblur:GetName())
+	CBox:SetValue(mblur:GetBool())
 	CBox:SizeToContents()
 
-	stamblur = GetConVarNumber("dec_staminablur")
+	stamblur = GetConVar("dec_staminablur")
 
 	CBox = create("DCheckBoxLabel", HelpPanel)
 	CBox:SetText("Stamina Blur (Requires Motion Blur!)")
 	CBox:SetPos(0, 20)
-	CBox:SetConVar(stamblur)
-	CBox:SetValue(stamblur)
+	CBox:SetConVar(stamblur:GetName())
+	CBox:SetValue(stamblur:GetBool())
 	CBox:SizeToContents()
 
-	stambeat = GetConVarNumber("dec_staminabeat")
+	stambeat = GetConVar("dec_staminabeat")
 
 	CBox = create("DCheckBoxLabel", HelpPanel)
 	CBox:SetText("Stamina Heartbeat")
 	CBox:SetPos(0, 40)
-	CBox:SetConVar(stambeat)
-	CBox:SetValue(stambeat)
+	CBox:SetConVar(stambeat:GetName())
+	CBox:SetValue(stambeat:GetBool())
 	CBox:SizeToContents()
 
 	PSheet:AddSheet("Options", HelpPanel, "gui/silkicons/wrench", false, false, "Disable or enable some stuff to your own liking.")
